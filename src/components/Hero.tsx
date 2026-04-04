@@ -189,7 +189,6 @@ export function Hero() {
                   borderColor: tech.color + "55",
                   color: tech.color,
                   background: tech.color + "11",
-                  boxShadow: `0 0 12px ${tech.color}22`,
                   fontSize: tech.icon.length > 1 ? "17px" : "28px",
                   lineHeight: 1,
                   transform: isPressed ? "scale(1.06)" : "scale(1)",
