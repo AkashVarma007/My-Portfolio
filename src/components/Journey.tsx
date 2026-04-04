@@ -1,0 +1,643 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { FadeUp } from "./RevealText";
+import { useHunt } from "@/context/HuntContext";
+
+const timeline = [
+  {
+    year: "Y1",
+    phase: "The Foundation",
+    role: "Software Engineer @ Varsun eTechnologies",
+    period: "2022 – 2023",
+    text: "Pivoted from ASP.NET to React & Node.js. Built an EV charger platform with OCPP 1.6 — real-time monitoring, dashboards, and analytics. Delivered a full client product from scratch.",
+    stack: ["React", "Node.js", "OCPP 1.6", "EV Infra"],
+    accentColor: "var(--color-accent-3)",
+    glowColor: "rgba(251,146,60,0.18)",
+    borderColor: "rgba(251,146,60,0.18)",
+    numberColor: "rgba(251,146,60,0.15)",
+  },
+  {
+    year: "Y2",
+    phase: "The Architect",
+    role: "Platform Engineer @ WaveFuel Solutions",
+    period: "2023 – 2024",
+    text: "Designed the IoT platform from scratch. Created FUS Script — a custom DSL. Built distributed WebSocket handling with Redis. Shipped a React Native app to both stores.",
+    stack: ["DSL Design", "Redis", "WebSockets", "React Native"],
+    accentColor: "var(--color-accent-2)",
+    glowColor: "rgba(129,140,248,0.18)",
+    borderColor: "rgba(129,140,248,0.18)",
+    numberColor: "rgba(129,140,248,0.12)",
+  },
+  {
+    year: "Y3",
+    phase: "The Leader",
+    role: "Platform Engineer @ WaveFuel Solutions",
+    period: "2024 – Present",
+    text: "Built form builders, MCP tools for AI chatbots, and a digital twin engine for 10K+ devices. Now mentoring 3 engineers and leading enterprise deployments worth ₹40L+.",
+    stack: ["Digital Twins", "AI / MCP", "Mentorship", "Enterprise"],
+    accentColor: "var(--color-accent)",
+    glowColor: "rgba(196,247,81,0.18)",
+    borderColor: "rgba(196,247,81,0.18)",
+    numberColor: "rgba(196,247,81,0.1)",
+  },
+];
+
+function JourneyCard({
+  item,
+  index,
+  side,
+}: {
+  item: typeof timeline[0];
+  index: number;
+  side: "left" | "right";
+}) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setVisible(true), index * 150);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [index]);
+
+  return (
+    <div
+      ref={ref}
+      className="gsap-journey-card"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible
+          ? "translateX(0) translateY(0)"
+          : side === "left"
+          ? "translateX(-32px) translateY(10px)"
+          : "translateX(32px) translateY(10px)",
+        transition: "opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1)",
+        position: "relative",
+      }}
+    >
+      {/* Glow behind card */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "-20px",
+          background: `radial-gradient(ellipse at center, ${item.glowColor} 0%, transparent 70%)`,
+          pointerEvents: "none",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.8s ease 0.3s",
+          borderRadius: "24px",
+        }}
+      />
+
+      {/* The card */}
+      <div
+        style={{
+          background: "var(--color-bg-card)",
+          border: `1px solid ${item.borderColor}`,
+          borderRadius: "16px",
+          padding: "24px 26px",
+          position: "relative",
+          overflow: "hidden",
+          transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 40px ${item.glowColor}`;
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+        }}
+      >
+        {/* Large faint year number in background */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: "-12px",
+            right: "12px",
+            fontFamily: "var(--font-display)",
+            fontSize: "6rem",
+            fontWeight: 900,
+            color: item.numberColor,
+            lineHeight: 1,
+            pointerEvents: "none",
+            userSelect: "none",
+            letterSpacing: "-4px",
+          }}
+        >
+          {item.year}
+        </div>
+
+        {/* Top accent line */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "16px",
+            right: "16px",
+            height: "1px",
+            background: `linear-gradient(90deg, transparent, ${item.accentColor}, transparent)`,
+            opacity: 0.6,
+          }}
+        />
+
+        {/* Phase */}
+        <div
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "1.15rem",
+            fontWeight: 800,
+            letterSpacing: "-0.5px",
+            color: "var(--color-text)",
+            marginBottom: "4px",
+          }}
+        >
+          {item.phase}
+        </div>
+
+        {/* Role + period */}
+        <div
+          style={{
+            fontFamily: "var(--font-code)",
+            fontSize: "0.6rem",
+            letterSpacing: "0.8px",
+            color: item.accentColor,
+            marginBottom: "14px",
+            opacity: 0.85,
+          }}
+        >
+          {item.role} &nbsp;·&nbsp; {item.period}
+        </div>
+
+        {/* Text */}
+        <p
+          style={{
+            fontSize: "0.82rem",
+            color: "var(--color-text-dim)",
+            lineHeight: 1.8,
+            marginBottom: "18px",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {item.text}
+        </p>
+
+        {/* Stack */}
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.05)",
+            paddingTop: "14px",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "6px",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {item.stack.map((tech) => (
+            <span
+              key={tech}
+              style={{
+                fontFamily: "var(--font-code)",
+                fontSize: "0.55rem",
+                padding: "3px 9px",
+                borderRadius: "100px",
+                border: `1px solid ${item.borderColor}`,
+                color: item.accentColor,
+                background: `${item.accentColor}10`,
+                letterSpacing: "0.5px",
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Floating decorative dots along the timeline
+function FloatingDots() {
+  const dots = [15, 35, 55, 72, 88];
+  return (
+    <>
+      {dots.map((top) => (
+        <div
+          key={top}
+          style={{
+            position: "absolute",
+            top: `${top}%`,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            background: "rgba(196,247,81,0.2)",
+            animation: `timeline-dot-pulse 3s ease-in-out infinite`,
+            animationDelay: `${top * 0.04}s`,
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+const CLUE7_SEQUENCE = ["Y3", "Y1", "Y2"];
+
+// Desktop: alternating left/right timeline
+function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onYearClick?: (year: string) => void }) {
+  const lineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Lazy-load GSAP only on client
+    let cleanup: (() => void) | undefined;
+    (async () => {
+      try {
+        const { default: gsap } = await import("gsap");
+        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+        gsap.registerPlugin(ScrollTrigger);
+
+        const line = lineRef.current;
+        if (!line) return;
+
+        gsap.fromTo(
+          line,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: line,
+              start: "top 80%",
+              end: "bottom 20%",
+              scrub: 0.5,
+            },
+          }
+        );
+        cleanup = () => ScrollTrigger.getAll().forEach((t) => t.kill());
+      } catch {
+        // GSAP not available, fall back gracefully
+        if (lineRef.current) lineRef.current.style.transform = "scaleY(1)";
+      }
+    })();
+    return () => cleanup?.();
+  }, []);
+
+  return (
+    <div style={{ position: "relative" }}>
+      {/* Center timeline spine */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 0,
+          bottom: 0,
+          width: "2px",
+          transform: "translateX(-50%)",
+          background: "rgba(255,255,255,0.05)",
+          zIndex: 0,
+        }}
+      >
+        {/* The animated fill line */}
+        <div
+          ref={lineRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 50%, var(--color-accent) 100%)",
+            transformOrigin: "top center",
+            transform: "scaleY(0)",
+            borderRadius: "2px",
+          }}
+        />
+        <FloatingDots />
+      </div>
+
+      {/* Timeline items */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "64px", paddingBottom: "32px" }}>
+        {timeline.map((item, i) => {
+          const side = i % 2 === 0 ? "left" : "right";
+          return (
+            <div
+              key={item.year}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 64px 1fr",
+                alignItems: "center",
+                gap: "0",
+              }}
+            >
+              {/* Left slot */}
+              <div style={{ paddingRight: "32px", paddingLeft: "0" }}>
+                {side === "left" ? (
+                  <JourneyCard item={item} index={i} side="left" />
+                ) : (
+                  // Connector line from right card to spine
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                    <div
+                      style={{
+                        height: "1px",
+                        width: "100%",
+                        background: `linear-gradient(90deg, transparent, ${item.borderColor})`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Center badge */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
+                <YearBadge item={item} clue6Found={clue6Found} onClick={() => onYearClick?.(item.year)} />
+              </div>
+
+              {/* Right slot */}
+              <div style={{ paddingLeft: "32px", paddingRight: "0" }}>
+                {side === "right" ? (
+                  <JourneyCard item={item} index={i} side="right" />
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        height: "1px",
+                        width: "100%",
+                        background: `linear-gradient(90deg, ${item.borderColor}, transparent)`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function YearBadge({ item, onClick, clue6Found }: { item: typeof timeline[0]; onClick?: () => void; clue6Found?: boolean }) {
+  return (
+    <div
+      onClick={clue6Found && onClick ? onClick : undefined}
+      style={{
+        width: "52px",
+        height: "52px",
+        borderRadius: "50%",
+        background: "var(--color-bg-elevated)",
+        border: `2px solid ${item.accentColor}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: `0 0 20px ${item.glowColor}, 0 0 0 4px rgba(255,255,255,0.03)`,
+        position: "relative",
+        zIndex: 2,
+        animation: "badge-pulse 2.5s ease-in-out infinite",
+        cursor: clue6Found ? "pointer" : "default",
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "0.72rem",
+          fontWeight: 800,
+          color: item.accentColor,
+          letterSpacing: "0.5px",
+        }}
+      >
+        {item.year}
+      </span>
+      {/* Outer pulse ring */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "-6px",
+          borderRadius: "50%",
+          border: `1px solid ${item.accentColor}`,
+          opacity: 0.2,
+          animation: "ring-pulse 2.5s ease-in-out infinite",
+        }}
+      />
+    </div>
+  );
+}
+
+// Mobile: left-aligned vertical layout
+function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onYearClick?: (year: string) => void }) {
+  const lineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    (async () => {
+      try {
+        const { default: gsap } = await import("gsap");
+        const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+        gsap.registerPlugin(ScrollTrigger);
+        const line = lineRef.current;
+        if (!line) return;
+        gsap.fromTo(
+          line,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: line,
+              start: "top 85%",
+              end: "bottom 30%",
+              scrub: 0.5,
+            },
+          }
+        );
+        cleanup = () => ScrollTrigger.getAll().forEach((t) => t.kill());
+      } catch {
+        if (lineRef.current) lineRef.current.style.transform = "scaleY(1)";
+      }
+    })();
+    return () => cleanup?.();
+  }, []);
+
+  return (
+    <div style={{ position: "relative", paddingLeft: "36px" }}>
+      {/* Left spine */}
+      <div
+        style={{
+          position: "absolute",
+          left: "10px",
+          top: 0,
+          bottom: 0,
+          width: "2px",
+          background: "rgba(255,255,255,0.05)",
+        }}
+      >
+        <div
+          ref={lineRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 50%, var(--color-accent) 100%)",
+            transformOrigin: "top center",
+            transform: "scaleY(0)",
+            borderRadius: "2px",
+          }}
+        />
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+        {timeline.map((item, i) => (
+          <div key={item.year} style={{ position: "relative" }}>
+            {/* Badge on the line */}
+            <div
+              onClick={clue6Found && onYearClick ? () => onYearClick(item.year) : undefined}
+              style={{
+                position: "absolute",
+                left: "-43px",
+                top: "20px",
+                width: "26px",
+                height: "26px",
+                borderRadius: "50%",
+                background: "var(--color-bg-elevated)",
+                border: `2px solid ${item.accentColor}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: `0 0 12px ${item.glowColor}`,
+                zIndex: 2,
+                cursor: clue6Found ? "pointer" : "default",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "0.5rem",
+                  fontWeight: 800,
+                  color: item.accentColor,
+                }}
+              >
+                {item.year}
+              </span>
+            </div>
+
+            <JourneyCard item={item} index={i} side="right" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function Journey() {
+  const { isClueFound, canAttemptClue, unlockClue } = useHunt();
+  const clue6Found = isClueFound(6);
+  const yearSeqRef = useRef<string[]>([]);
+
+  function handleYearClick(year: string) {
+    if (!canAttemptClue(7)) return;
+    const seq = yearSeqRef.current;
+    seq.push(year);
+    if (seq.length > 3) seq.splice(0, seq.length - 3);
+    const last3 = seq.slice(-3);
+    if (
+      last3.length === 3 &&
+      last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])
+    ) {
+      unlockClue(7);
+      yearSeqRef.current = [];
+    } else if (seq.length === 3 && !last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])) {
+      // Wrong sequence, reset
+      yearSeqRef.current = [];
+    }
+  }
+
+  return (
+    <section id="journey" className="py-24 md:py-36 relative z-[1]">
+      {/* CSS keyframes injected via style tag */}
+      <style>{`
+        @keyframes badge-pulse {
+          0%, 100% { box-shadow: 0 0 20px var(--pulse-glow, rgba(196,247,81,0.18)), 0 0 0 4px rgba(255,255,255,0.03); }
+          50% { box-shadow: 0 0 32px var(--pulse-glow, rgba(196,247,81,0.28)), 0 0 0 6px rgba(255,255,255,0.05); }
+        }
+        @keyframes ring-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.2; }
+          50% { transform: scale(1.15); opacity: 0.08; }
+        }
+        @keyframes timeline-dot-pulse {
+          0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(1); }
+          50% { opacity: 0.5; transform: translateX(-50%) scale(1.6); }
+        }
+      `}</style>
+
+      {/* Subtle radial bg */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "30%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "700px",
+          height: "500px",
+          background: "radial-gradient(ellipse at center, rgba(196,247,81,0.025) 0%, transparent 65%)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      {/* Decorative large "03" in background */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "8%",
+          left: "-2%",
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(6rem,20vw,18rem)",
+          fontWeight: 900,
+          letterSpacing: "-8px",
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(255,255,255,0.025)",
+          pointerEvents: "none",
+          userSelect: "none",
+          lineHeight: 1,
+          zIndex: 0,
+        }}
+      >
+        03
+      </div>
+
+      <div className="max-w-[1300px] mx-auto px-6 md:px-12 relative" style={{ zIndex: 1 }}>
+        <FadeUp>
+          <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-text-muted block mb-4">
+            03 / Journey
+          </span>
+        </FadeUp>
+        <FadeUp delay={0.08}>
+          <h2 className="font-display text-[clamp(1.6rem,4vw,3.2rem)] font-extrabold tracking-[-2px] leading-[1.1] mb-14">
+            The <span className="serif-italic font-normal">evolution</span>
+          </h2>
+        </FadeUp>
+
+        {/* Desktop layout */}
+        <div className="hidden md:block">
+          <DesktopTimeline clue6Found={clue6Found} onYearClick={handleYearClick} />
+        </div>
+
+        {/* Mobile layout */}
+        <div className="block md:hidden">
+          <MobileTimeline clue6Found={clue6Found} onYearClick={handleYearClick} />
+        </div>
+      </div>
+    </section>
+  );
+}
