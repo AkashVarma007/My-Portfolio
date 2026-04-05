@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeUp } from "./RevealText";
 import { useHunt } from "@/context/HuntContext";
 
@@ -58,17 +58,21 @@ function JourneyCard({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let timeoutId: ReturnType<typeof setTimeout>;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setVisible(true), index * 150);
+          timeoutId = setTimeout(() => setVisible(true), index * 150);
           observer.disconnect();
         }
       },
       { threshold: 0.2 }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, [index]);
 
   return (
@@ -260,18 +264,17 @@ function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; on
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Lazy-load GSAP only on client
+    let mounted = true;
     let cleanup: (() => void) | undefined;
     (async () => {
       try {
         const { default: gsap } = await import("gsap");
         const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+        if (!mounted) return;
         gsap.registerPlugin(ScrollTrigger);
-
         const line = lineRef.current;
         if (!line) return;
-
-        gsap.fromTo(
+        const tween = gsap.fromTo(
           line,
           { scaleY: 0 },
           {
@@ -285,13 +288,12 @@ function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; on
             },
           }
         );
-        cleanup = () => ScrollTrigger.getAll().forEach((t) => t.kill());
+        cleanup = () => { tween.kill(); tween.scrollTrigger?.kill(); };
       } catch {
-        // GSAP not available, fall back gracefully
         if (lineRef.current) lineRef.current.style.transform = "scaleY(1)";
       }
     })();
-    return () => cleanup?.();
+    return () => { mounted = false; cleanup?.(); };
   }, []);
 
   return (
@@ -437,15 +439,17 @@ function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onY
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let mounted = true;
     let cleanup: (() => void) | undefined;
     (async () => {
       try {
         const { default: gsap } = await import("gsap");
         const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+        if (!mounted) return;
         gsap.registerPlugin(ScrollTrigger);
         const line = lineRef.current;
         if (!line) return;
-        gsap.fromTo(
+        const tween = gsap.fromTo(
           line,
           { scaleY: 0 },
           {
@@ -459,12 +463,12 @@ function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onY
             },
           }
         );
-        cleanup = () => ScrollTrigger.getAll().forEach((t) => t.kill());
+        cleanup = () => { tween.kill(); tween.scrollTrigger?.kill(); };
       } catch {
         if (lineRef.current) lineRef.current.style.transform = "scaleY(1)";
       }
     })();
-    return () => cleanup?.();
+    return () => { mounted = false; cleanup?.(); };
   }, []);
 
   return (
@@ -542,23 +546,19 @@ export function Journey() {
   const clue6Found = isClueFound(6);
   const yearSeqRef = useRef<string[]>([]);
 
-  function handleYearClick(year: string) {
+  const handleYearClick = useCallback((year: string) => {
     if (!canAttemptClue(7)) return;
     const seq = yearSeqRef.current;
     seq.push(year);
     if (seq.length > 3) seq.splice(0, seq.length - 3);
     const last3 = seq.slice(-3);
-    if (
-      last3.length === 3 &&
-      last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])
-    ) {
+    if (last3.length === 3 && last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])) {
       unlockClue(7);
       yearSeqRef.current = [];
     } else if (seq.length === 3 && !last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])) {
-      // Wrong sequence, reset
       yearSeqRef.current = [];
     }
-  }
+  }, [canAttemptClue, unlockClue]);
 
   return (
     <section id="journey" className="py-24 md:py-36 relative z-[1]">

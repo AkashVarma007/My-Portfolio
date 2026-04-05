@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useHunt } from "@/context/HuntContext";
 
 const ROW_1 = [
@@ -74,7 +74,6 @@ function MarqueeRow({ items, direction = "left", speed = 32, clue4Found, onBrigh
                 color: isBright ? "rgba(230,230,238,0.95)" : "rgba(178,175,187,0.75)",
                 cursor: isBright ? "pointer" : "default",
                 fontWeight: isBright ? 550 : 500,
-                textShadow: undefined,
               }}
               onClick={isBright && onBrightClick ? () => onBrightClick(item) : undefined}
             >
@@ -83,7 +82,6 @@ function MarqueeRow({ items, direction = "left", speed = 32, clue4Found, onBrigh
                 className="w-1.5 h-1.5 rounded-full bg-accent transition-opacity duration-200 marquee-dot"
                 style={{
                   opacity: isBright ? 0.55 : 0.35,
-                  boxShadow: undefined,
                 }}
               />
             </span>
@@ -99,14 +97,14 @@ export function Marquee() {
   const clue4Found = isClueFound(4);
   const clickedBright = useRef(new Set<string>());
 
-  function handleBrightClick(item: string) {
+  const handleBrightClick = useCallback((item: string) => {
     if (!canAttemptClue(5)) return;
     clickedBright.current.add(item);
     if (clickedBright.current.size >= BRIGHT_ITEMS.size) {
       unlockClue(5);
       clickedBright.current.clear();
     }
-  }
+  }, [canAttemptClue, unlockClue]);
 
   return (
     <div className="border-y border-border py-0 relative z-[1] overflow-hidden">

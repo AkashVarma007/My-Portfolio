@@ -37,6 +37,12 @@ export function HiddenTerminal() {
   const { totalFound, totalClues, isClueFound, canAttemptClue, unlockClue } =
     useHunt();
 
+  // Stable refs so keydown effect never restarts due to context re-renders
+  const huntRef = useRef({ canAttemptClue, unlockClue, isClueFound });
+  useEffect(() => {
+    huntRef.current = { canAttemptClue, unlockClue, isClueFound };
+  }, [canAttemptClue, unlockClue, isClueFound]);
+
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<HistoryEntry[]>([
@@ -80,35 +86,31 @@ export function HiddenTerminal() {
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       const key = e.key;
-
       if (key === KONAMI[konamiProgress.current]) {
         konamiProgress.current += 1;
         if (konamiProgress.current === KONAMI.length) {
           konamiProgress.current = 0;
           setOpen(true);
-          // Unlock clue 13 if eligible
-          if (canAttemptClue(13)) {
-            unlockClue(13);
+          if (huntRef.current.canAttemptClue(13)) {
+            huntRef.current.unlockClue(13);
           }
         }
       } else {
         konamiProgress.current = key === KONAMI[0] ? 1 : 0;
       }
     }
-
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [canAttemptClue, unlockClue]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // hunt callbacks accessed via huntRef
 
   // ------------------------------------------------------------------
   // External open trigger (AchievementWidget button)
   // ------------------------------------------------------------------
   useEffect(() => {
-    function handleOpen() {
-      setOpen(true);
-    }
-    window.addEventListener("open-terminal", handleOpen as EventListener);
-    return () => window.removeEventListener("open-terminal", handleOpen as EventListener);
+    const handleOpen = () => setOpen(true);
+    window.addEventListener("open-terminal", handleOpen);
+    return () => window.removeEventListener("open-terminal", handleOpen);
   }, []);
 
   // ------------------------------------------------------------------

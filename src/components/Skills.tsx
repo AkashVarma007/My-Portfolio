@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeUp } from "./RevealText";
 import { useHunt } from "@/context/HuntContext";
 
@@ -49,6 +49,14 @@ const skills = [
   },
 ];
 
+const sizeMap: Record<number, { fontSize: string; fontWeight: number; opacity: number }> = {
+  5: { fontSize: "1.15rem", fontWeight: 700, opacity: 1 },
+  4: { fontSize: "0.95rem", fontWeight: 600, opacity: 0.9 },
+  3: { fontSize: "0.82rem", fontWeight: 500, opacity: 0.75 },
+  2: { fontSize: "0.72rem", fontWeight: 400, opacity: 0.55 },
+  1: { fontSize: "0.64rem", fontWeight: 400, opacity: 0.4 },
+};
+
 // Tech cloud: all techs with a weight for sizing
 const techCloud = [
   { name: "TypeScript", weight: 5 },
@@ -87,18 +95,21 @@ function SkillBar({ skill, index, clue7Found, onPercentClick }: { skill: typeof 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let timeoutId: ReturnType<typeof setTimeout>;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Staggered delay per index
-          setTimeout(() => setFilled(true), index * 120);
+          timeoutId = setTimeout(() => setFilled(true), index * 120);
           observer.disconnect();
         }
       },
       { threshold: 0.3 }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, [index]);
 
   return (
@@ -230,14 +241,6 @@ function SkillBar({ skill, index, clue7Found, onPercentClick }: { skill: typeof 
 function TechCloud() {
   const [active, setActive] = useState<string | null>(null);
 
-  const sizeMap: Record<number, { fontSize: string; fontWeight: number; opacity: number }> = {
-    5: { fontSize: "1.15rem", fontWeight: 700, opacity: 1 },
-    4: { fontSize: "0.95rem", fontWeight: 600, opacity: 0.9 },
-    3: { fontSize: "0.82rem", fontWeight: 500, opacity: 0.75 },
-    2: { fontSize: "0.72rem", fontWeight: 400, opacity: 0.55 },
-    1: { fontSize: "0.64rem", fontWeight: 400, opacity: 0.4 },
-  };
-
   return (
     <div
       style={{
@@ -307,14 +310,14 @@ export function Skills() {
   const clue7Found = isClueFound(7);
   const clickedPercentages = useRef(new Set<number>());
 
-  function handlePercentClick(index: number) {
+  const handlePercentClick = useCallback((index: number) => {
     if (!canAttemptClue(8)) return;
     clickedPercentages.current.add(index);
     if (clickedPercentages.current.size >= skills.length) {
       unlockClue(8);
       clickedPercentages.current.clear();
     }
-  }
+  }, [canAttemptClue, unlockClue]);
 
   return (
     <section id="skills" className="py-24 md:py-36 relative z-[1]">

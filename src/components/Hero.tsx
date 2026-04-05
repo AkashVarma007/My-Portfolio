@@ -247,18 +247,30 @@ export function Hero() {
 
           {/* CTA buttons */}
           <div className="flex flex-wrap items-center gap-4 mb-14">
-            <a
-              href="#work"
+            <button
+              onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })}
               className="group relative inline-flex items-center gap-2 px-7 py-3 bg-accent text-bg font-display font-bold text-[0.85rem] tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_28px_rgba(196,247,81,0.4)]"
             >
               View My Work
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-            </a>
-            <a
-              href="#contact"
+            </button>
+            <button
+              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
               className="inline-flex items-center gap-2 px-7 py-3 border border-border-light text-text font-display font-semibold text-[0.85rem] tracking-wide rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:shadow-[0_0_18px_rgba(196,247,81,0.12)]"
             >
               Get In Touch
+            </button>
+            <a
+              href="/resume.pdf"
+              download="Akash_Varma_Resume.pdf"
+              className="group inline-flex items-center gap-2 px-5 py-3 font-code text-[0.7rem] tracking-[2px] uppercase text-text-muted hover:text-text transition-colors duration-300"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-transform duration-300 group-hover:translate-y-0.5">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Resume
             </a>
           </div>
 

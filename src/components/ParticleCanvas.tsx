@@ -15,11 +15,17 @@ export function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { canAttemptClue, unlockClue, isClueFound } = useHunt();
 
+  // Keep latest hunt callbacks in a ref so the canvas effect never restarts
+  // just because HuntContext re-renders with new function references
+  const huntRef = useRef({ canAttemptClue, unlockClue, isClueFound });
+  useEffect(() => {
+    huntRef.current = { canAttemptClue, unlockClue, isClueFound };
+  }, [canAttemptClue, unlockClue, isClueFound]);
+
   useEffect(() => {
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
 
-    // Capture as non-nullable so TypeScript is happy inside nested closures
     const canvas: HTMLCanvasElement = canvasEl;
     const ctxRaw = canvas.getContext("2d");
     if (!ctxRaw) return;
@@ -92,6 +98,7 @@ export function ParticleCanvas() {
 
     function draw() {
       const now = performance.now();
+      const { canAttemptClue, isClueFound, unlockClue } = huntRef.current;
       const clue11Active = canAttemptClue(11) && !isClueFound(11);
       if (clue11Active) {
         if (!messageVisible && now >= nextMessageAt) {
@@ -202,6 +209,7 @@ export function ParticleCanvas() {
 
     function onClick() {
       if (!messageVisible) return;
+      const { canAttemptClue, isClueFound, unlockClue } = huntRef.current;
       if (canAttemptClue(11) && !isClueFound(11)) {
         unlockClue(11);
         messageVisible = false;
@@ -225,7 +233,8 @@ export function ParticleCanvas() {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("click", onClick);
     };
-  }, [canAttemptClue, unlockClue, isClueFound]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // hunt callbacks accessed via huntRef — no re-init on context changes
 
   return (
     <canvas

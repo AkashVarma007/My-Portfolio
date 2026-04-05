@@ -17,6 +17,14 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
  * impact shockwave + sparks → rich ARCADE reveal scene → navigate to /arcade →
  * arcade page lifts curtain.
  */
+const ARCADE_EVENT = "trigger-arcade-curtain";
+
+/** Called by the Footer button — dispatches a CustomEvent so the
+ *  ArcadeCurtain component picks it up without a global mutable. */
+export function triggerArcade() {
+  window.dispatchEvent(new CustomEvent(ARCADE_EVENT));
+}
+
 export function ArcadeCurtain() {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
@@ -25,8 +33,19 @@ export function ArcadeCurtain() {
   >("idle");
   const progressRef = useRef(0);
   const triggered = useRef(false);
+
+  // Listen for the intentional footer button trigger
+  useEffect(() => {
+    function handleTrigger() {
+      if (!triggered.current) {
+        triggered.current = true;
+        setPhase("dropping");
+      }
+    }
+    window.addEventListener(ARCADE_EVENT, handleTrigger);
+    return () => window.removeEventListener(ARCADE_EVENT, handleTrigger);
+  }, []);
   const lastWheelTime = useRef(0);
-  const decayRaf = useRef<number | null>(null);
   const [sceneStep, setSceneStep] = useState(0); // 0=nothing, 1=grid+emblem, 2=text, 3=subtitle+bar
 
   // ── Wheel handler ──
@@ -36,7 +55,8 @@ export function ArcadeCurtain() {
     if (window.scrollY < maxScroll - 2) return;
 
     lastWheelTime.current = Date.now();
-    const bump = Math.min(6, Math.max(1.5, Math.abs(e.deltaY) / 30));
+    // Reduced bump so it takes deliberate sustained scrolling (not accidental)
+    const bump = Math.min(2.5, Math.max(0.6, Math.abs(e.deltaY) / 60));
     progressRef.current = Math.min(100, progressRef.current + bump);
     setProgress(progressRef.current);
 
@@ -48,21 +68,22 @@ export function ArcadeCurtain() {
 
   // ── Decay loop ──
   useEffect(() => {
+    let rafId: number;
     let running = true;
     const tick = () => {
       if (!running) return;
       if (!triggered.current && progressRef.current > 0) {
         const idle = Date.now() - lastWheelTime.current;
-        if (idle > 200) {
-          const rate = 0.6 + (progressRef.current / 100) * 0.6;
+        if (idle > 150) {
+          const rate = 1.8 + (progressRef.current / 100) * 1.2;
           progressRef.current = Math.max(0, progressRef.current - rate);
           setProgress(progressRef.current);
         }
       }
-      decayRaf.current = requestAnimationFrame(tick);
+      rafId = requestAnimationFrame(tick);
     };
-    decayRaf.current = requestAnimationFrame(tick);
-    return () => { running = false; if (decayRaf.current) cancelAnimationFrame(decayRaf.current); };
+    rafId = requestAnimationFrame(tick);
+    return () => { running = false; cancelAnimationFrame(rafId); };
   }, []);
 
   // ── Wheel listener ──

@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 
+type FormStatus = "idle" | "sending" | "sent" | "error";
+
 export function Contact() {
   const [focused, setFocused] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<FormStatus>("idle");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -24,11 +26,33 @@ export function Contact() {
     return () => section.removeEventListener("mousemove", handler);
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
-    formRef.current?.reset();
-    setTimeout(() => setSubmitted(false), 3500);
+    if (status === "sending") return;
+
+    const formspreeId = process.env.NEXT_PUBLIC_FORMSPREE_ID;
+    const form = formRef.current;
+    if (!form) return;
+
+    setStatus("sending");
+
+    try {
+      if (formspreeId) {
+        const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error("Formspree error");
+      }
+      // If no Formspree ID configured, just show success (dev mode)
+      setStatus("sent");
+      form.reset();
+      setTimeout(() => setStatus("idle"), 4000);
+    } catch {
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 4000);
+    }
   }
 
   return (
@@ -126,25 +150,31 @@ export function Contact() {
 
               <button
                 type="submit"
-                className="group relative font-display font-bold text-[0.85rem] px-8 py-4 rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] w-full md:w-auto"
+                disabled={status === "sending" || status === "sent"}
+                className="group relative font-display font-bold text-[0.85rem] px-8 py-4 rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] w-full md:w-auto disabled:cursor-not-allowed disabled:opacity-80"
                 style={{
-                  background: submitted ? "rgba(196,247,81,0.1)" : "var(--color-accent)",
-                  color: submitted ? "var(--color-accent)" : "var(--color-bg)",
+                  background: status === "sent" ? "rgba(196,247,81,0.1)" : status === "error" ? "rgba(255,80,80,0.1)" : "var(--color-accent)",
+                  color: status === "sent" ? "var(--color-accent)" : status === "error" ? "#ff6060" : "var(--color-bg)",
                 }}
               >
                 <span className="relative z-[1] flex items-center justify-center gap-2">
-                  {submitted ? (
+                  {status === "sending" && (
+                    <>
+                      <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      Sending…
+                    </>
+                  )}
+                  {status === "sent" && (
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5" /></svg>
                       Sent!
                     </>
-                  ) : (
+                  )}
+                  {status === "error" && "Failed — try again"}
+                  {status === "idle" && (
                     <>
                       Send Message
-                      <svg
-                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                        className="transition-transform duration-300 group-hover:translate-x-1"
-                      >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-transform duration-300 group-hover:translate-x-1">
                         <path d="M5 12h14M12 5l7 7-7 7" />
                       </svg>
                     </>

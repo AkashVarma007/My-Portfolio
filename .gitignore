@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .superpowers/
+
+# personal files — root-level, not needed in repo
+Me.txt
+Akash\ Varma\ Resume-7.pdf

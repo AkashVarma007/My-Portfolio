@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { HuntProvider } from "@/context/HuntContext";
 import { GradientMesh } from "@/components/GradientMesh";
 import { ParticleCanvas } from "@/components/ParticleCanvas";
@@ -20,14 +20,17 @@ import { ArcadeCurtain } from "@/components/ArcadeCurtain";
 import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
 import { HiddenTerminal } from "@/components/hunt/HiddenTerminal";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false);
+  const handlePreloaderComplete = useCallback(() => setPreloaderDone(true), []);
 
   return (
     <HuntProvider>
+      <SmoothScroll />
       <CustomCursor />
-      <Preloader onComplete={() => setPreloaderDone(true)} />
+      <Preloader onComplete={handlePreloaderComplete} />
 
       <div
         style={{
