@@ -187,6 +187,7 @@ function ProjectCard({ project, index }: { project: typeof projects[number]; ind
   return (
     <div
       className="gsap-project-card h-full cursor-default"
+      data-cursor="VIEW"
       style={{
         borderRadius: "1rem",
         border: `1px solid ${hovered ? `${project.accent}30` : "rgba(255,255,255,0.05)"}`,
@@ -341,6 +342,7 @@ export function Projects() {
         <FadeUp delay={0.12}>
           <div
             className="gsap-project-card relative overflow-hidden rounded-3xl mb-5 group"
+            data-cursor="VIEW"
             style={{
               background:
                 "linear-gradient(135deg, #0e1a06 0%, #0e0e14 40%, #0a0a12 100%)",

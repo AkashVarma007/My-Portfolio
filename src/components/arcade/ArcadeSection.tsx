@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 import { ArcadeNav } from "./ArcadeNav";
 import { ArcadeFeatured } from "./ArcadeFeatured";
@@ -9,7 +9,7 @@ import { ArcadeAchievements } from "./ArcadeAchievements";
 import { ArcadeLeaderboard } from "./ArcadeLeaderboard";
 import { GameOverlay } from "./GameOverlay";
 
-const RED = "#ff2d55";
+const RED    = "#ff2d55";
 const ORANGE = "#ff6b2d";
 
 type Tab = "games" | "achievements" | "leaderboard";
@@ -30,7 +30,7 @@ const GAMES: GameDef[] = [
     icon: "👾",
     category: "Shooter",
     categoryColor: "#00d4ff",
-    bg: "linear-gradient(135deg, #0a0a1a 0%, #0d1a2e 100%)",
+    bg: "linear-gradient(135deg, #06080f 0%, #0a1020 100%)",
   },
   {
     id: "snake",
@@ -38,7 +38,7 @@ const GAMES: GameDef[] = [
     icon: "🐍",
     category: "Arcade",
     categoryColor: "#00ff88",
-    bg: "linear-gradient(135deg, #060f06 0%, #0a1a0a 100%)",
+    bg: "linear-gradient(135deg, #06100a 0%, #0a1810 100%)",
   },
   {
     id: "breakout",
@@ -46,7 +46,7 @@ const GAMES: GameDef[] = [
     icon: "🧱",
     category: "Breaker",
     categoryColor: "#ffaa00",
-    bg: "linear-gradient(135deg, #140a00 0%, #1e1000 100%)",
+    bg: "linear-gradient(135deg, #140c00 0%, #1e1200 100%)",
   },
   {
     id: "pong",
@@ -54,7 +54,7 @@ const GAMES: GameDef[] = [
     icon: "🏓",
     category: "Sports",
     categoryColor: "#cc44ff",
-    bg: "linear-gradient(135deg, #0e0a14 0%, #160e1e 100%)",
+    bg: "linear-gradient(135deg, #0e0818 0%, #160e22 100%)",
   },
 ];
 
@@ -67,14 +67,17 @@ const SECRET_GAME: GameDef = {
   bg: `linear-gradient(135deg, #140006 0%, #1e000a 100%)`,
 };
 
+const ALL_GAMES = [...GAMES, SECRET_GAME];
+
 export function ArcadeSection() {
   const { totalFound } = useHunt();
-  const [activeTab, setActiveTab] = useState<Tab>("games");
+  const [activeTab, setActiveTab]       = useState<Tab>("games");
   const [featuredGame, setFeaturedGame] = useState<GameDef>(GAMES[0]);
-  const [activeGame, setActiveGame] = useState<GameDef | null>(null);
+  const [activeGame, setActiveGame]     = useState<GameDef | null>(null);
 
-  // Secret game unlocks at 5+ clues found
-  const secretUnlocked = totalFound >= 5;
+  const secretUnlocked  = totalFound >= 5;
+  const featuredIdx     = ALL_GAMES.findIndex((g) => g.id === featuredGame.id);
+  const visibleTotal    = secretUnlocked ? ALL_GAMES.length : GAMES.length;
 
   return (
     <div
@@ -87,103 +90,137 @@ export function ArcadeSection() {
         overflow: "hidden",
       }}
     >
-      {/* Tron-style perspective grid floor */}
+      {/* ── Full-page CRT scan lines ─────────────────────────────────────── */}
       <div
+        aria-hidden
         style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: "60%",
-          background: `
-            linear-gradient(rgba(255,45,85,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,45,85,0.04) 1px, transparent 1px)
-          `,
+          position: "absolute", inset: 0,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
+          pointerEvents: "none",
+          zIndex: 5,
+        }}
+      />
+
+      {/* ── Tron-style perspective grid floor ────────────────────────────── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", left: 0, right: 0, bottom: 0, height: "55%",
+          backgroundImage: `linear-gradient(rgba(255,45,85,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,45,85,0.06) 1px, transparent 1px)`,
           backgroundSize: "60px 60px",
-          transform: "perspective(400px) rotateX(55deg)",
+          transform: "perspective(350px) rotateX(58deg)",
           transformOrigin: "bottom center",
-          maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%)",
-          pointerEvents: "none",
-          zIndex: 0,
+          maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%)",
+          pointerEvents: "none", zIndex: 0,
         }}
       />
 
-      {/* Radial glow from top-center */}
+      {/* ── Radial glow — top centre ─────────────────────────────────────── */}
       <div
+        aria-hidden
         style={{
-          position: "absolute",
-          top: -80,
-          left: "50%",
+          position: "absolute", top: -100, left: "50%",
           transform: "translateX(-50%)",
-          width: "120%",
-          height: 500,
-          background: `radial-gradient(ellipse 50% 60% at 50% 0%, rgba(255,45,85,0.08) 0%, rgba(255,107,45,0.03) 40%, transparent 70%)`,
-          pointerEvents: "none",
-          zIndex: 0,
+          width: "140%", height: 600,
+          background: "radial-gradient(ellipse 55% 55% at 50% 0%, rgba(255,45,85,0.10) 0%, rgba(255,107,45,0.04) 45%, transparent 70%)",
+          pointerEvents: "none", zIndex: 0,
         }}
       />
 
-      {/* Top accent line */}
+      {/* ── Side ambient glows ───────────────────────────────────────────── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", top: "20%", left: "-5%",
+          width: 400, height: 600, borderRadius: "50%",
+          background: `radial-gradient(ellipse, rgba(255,45,85,0.04) 0%, transparent 70%)`,
+          filter: "blur(40px)", pointerEvents: "none", zIndex: 0,
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", top: "30%", right: "-5%",
+          width: 400, height: 600, borderRadius: "50%",
+          background: `radial-gradient(ellipse, rgba(255,107,45,0.04) 0%, transparent 70%)`,
+          filter: "blur(40px)", pointerEvents: "none", zIndex: 0,
+        }}
+      />
+
+      {/* ── Full-page corner brackets ────────────────────────────────────── */}
+      {(
+        [
+          { pos: { top: 0,    left: 0  } as React.CSSProperties, bt: true,  bl: true,  br: false, bb: false },
+          { pos: { top: 0,    right: 0 } as React.CSSProperties, bt: true,  bl: false, br: true,  bb: false },
+          { pos: { bottom: 0, left: 0  } as React.CSSProperties, bt: false, bl: true,  br: false, bb: true  },
+          { pos: { bottom: 0, right: 0 } as React.CSSProperties, bt: false, bl: false, br: true,  bb: true  },
+        ]
+      ).map((c, i) => (
+        <div
+          key={i}
+          aria-hidden
+          style={{
+            position: "absolute", width: 20, height: 20, zIndex: 5, pointerEvents: "none",
+            ...c.pos,
+            borderTop:    c.bt ? "1px solid rgba(255,45,85,0.35)" : undefined,
+            borderLeft:   c.bl ? "1px solid rgba(255,45,85,0.35)" : undefined,
+            borderRight:  c.br ? "1px solid rgba(255,45,85,0.35)" : undefined,
+            borderBottom: c.bb ? "1px solid rgba(255,45,85,0.35)" : undefined,
+          }}
+        />
+      ))}
+
+      {/* ── Top accent line ──────────────────────────────────────────────── */}
       <div
         style={{
           height: 2,
-          background: `linear-gradient(90deg, ${RED}, ${ORANGE})`,
-          width: "100%",
-          position: "relative",
-          zIndex: 1,
+          background: `linear-gradient(90deg, transparent, ${RED}, ${ORANGE}, ${RED}, transparent)`,
+          width: "100%", position: "relative", zIndex: 1,
+          boxShadow: `0 0 12px rgba(255,45,85,0.4)`,
         }}
       />
 
-      {/* Navigation */}
+      {/* ── Navigation ───────────────────────────────────────────────────── */}
       <div style={{ position: "relative", zIndex: 10 }}>
         <ArcadeNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      {/* Tab content */}
+      {/* ── Tab content ──────────────────────────────────────────────────── */}
       {activeTab === "games" && (
         <div style={{ position: "relative", zIndex: 1 }}>
-          {/* Featured hero */}
+          {/* Full-viewport hero */}
           <ArcadeFeatured
             game={featuredGame}
+            gameIndex={featuredIdx >= 0 ? featuredIdx : 0}
+            totalGames={visibleTotal}
             onLaunch={() => setActiveGame(featuredGame)}
           />
 
-          {/* Spacer between featured and library */}
-          <div style={{ height: 32 }} />
-
-          {/* Game library strip */}
+          {/* ── Game library strip ─────────────────────────────────────── */}
           <div
             style={{
-              display: "flex",
-              alignItems: "stretch",
-              gap: 0,
-              padding: "24px 28px 48px",
+              display: "flex", alignItems: "stretch", gap: 0,
+              padding: "28px 28px 52px",
               borderTop: "1px solid rgba(255,255,255,0.05)",
+              background: "rgba(0,0,0,0.15)",
+              backdropFilter: "blur(8px)",
             }}
           >
             {/* Vertical "Library" label */}
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                writingMode: "vertical-rl", textOrientation: "mixed",
                 transform: "rotate(180deg)",
-                paddingRight: 16,
-                paddingLeft: 4,
-                flexShrink: 0,
+                paddingRight: 18, paddingLeft: 4, flexShrink: 0,
               }}
             >
               <span
                 style={{
                   fontFamily: "var(--font-orbitron), monospace",
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: 3,
-                  color: "rgba(255,255,255,0.15)",
-                  textTransform: "uppercase",
+                  fontSize: 8, fontWeight: 700, letterSpacing: 4,
+                  color: "rgba(255,255,255,0.12)", textTransform: "uppercase",
                 }}
               >
                 Library
@@ -193,11 +230,8 @@ export function ArcadeSection() {
             {/* Card row */}
             <div
               style={{
-                display: "flex",
-                gap: 16,
-                flex: 1,
-                overflowX: "auto",
-                paddingBottom: 4,
+                display: "flex", gap: 14, flex: 1,
+                overflowX: "auto", paddingBottom: 4,
               }}
             >
               {GAMES.map((game) => (
@@ -216,12 +250,8 @@ export function ArcadeSection() {
                 game={SECRET_GAME}
                 isFeatured={featuredGame.id === SECRET_GAME.id}
                 locked={!secretUnlocked}
-                onClick={() => {
-                  if (secretUnlocked) setFeaturedGame(SECRET_GAME);
-                }}
-                onPlay={() => {
-                  if (secretUnlocked) setActiveGame(SECRET_GAME);
-                }}
+                onClick={() => { if (secretUnlocked) setFeaturedGame(SECRET_GAME); }}
+                onPlay={() => { if (secretUnlocked) setActiveGame(SECRET_GAME); }}
               />
             </div>
           </div>
@@ -239,7 +269,7 @@ export function ArcadeSection() {
         </div>
       )}
 
-      {/* Game overlay */}
+      {/* ── Game overlay ─────────────────────────────────────────────────── */}
       {activeGame && (
         <GameOverlay
           gameId={activeGame.id}
@@ -247,6 +277,13 @@ export function ArcadeSection() {
           onClose={() => setActiveGame(null)}
         />
       )}
+
+      <style>{`
+        @keyframes arc-grid-drift {
+          from { background-position: 0 0; }
+          to   { background-position: 0 60px; }
+        }
+      `}</style>
     </div>
   );
 }

@@ -55,8 +55,8 @@ interface GameState {
   keys: Set<string>;
   spaceHeld: boolean;
   playerShootCooldown: number;
-  clue12Unlocked: boolean;
-  clue12ToastUntil: number;
+  clue13Unlocked: boolean;
+  clue13ToastUntil: number;
 }
 
 function buildInvaders(wave: number): Invader[][] {
@@ -99,8 +99,8 @@ function makeInitialState(wave: number): GameState {
     keys: new Set(),
     spaceHeld: false,
     playerShootCooldown: 0,
-    clue12Unlocked: false,
-    clue12ToastUntil: 0,
+    clue13Unlocked: false,
+    clue13ToastUntil: 0,
   };
 }
 
@@ -136,7 +136,7 @@ export function InvadersGame() {
           const nextWave = s.wave + 1;
           const ns = makeInitialState(nextWave);
           ns.score = s.score;
-          ns.clue12Unlocked = s.clue12Unlocked;
+          ns.clue13Unlocked = s.clue13Unlocked;
           stateRef.current = ns;
           setPhase("playing");
           setDisplayWave(nextWave);
@@ -295,11 +295,11 @@ export function InvadersGame() {
         setPhase("wave_clear");
 
         // Clue 12 trigger at wave 10
-        if (s.wave >= 10 && !s.clue12Unlocked && canAttemptClue(12)) {
-          const unlocked = unlockClue(12);
+        if (s.wave >= 10 && !s.clue13Unlocked && canAttemptClue(13)) {
+          const unlocked = unlockClue(13);
           if (unlocked) {
-            s.clue12Unlocked = true;
-            s.clue12ToastUntil = performance.now() + 2500;
+            s.clue13Unlocked = true;
+            s.clue13ToastUntil = performance.now() + 2500;
           }
         }
       }
@@ -368,14 +368,14 @@ export function InvadersGame() {
       ctx.textAlign = "center";
       ctx.fillText(`SCORE: ${s.score}`, W / 2, H / 2 + 10);
 
-      if (s.clue12ToastUntil && performance.now() < s.clue12ToastUntil) {
+      if (s.clue13ToastUntil && performance.now() < s.clue13ToastUntil) {
         ctx.save();
         ctx.shadowBlur = 18;
         ctx.shadowColor = "#00ffaa";
         ctx.fillStyle = "#00ffaa";
         ctx.font = "bold 18px 'Orbitron', monospace";
         ctx.textAlign = "center";
-        ctx.fillText("CLUE 12 UNLOCKED", W / 2, H / 2 + 34);
+        ctx.fillText("CLUE 13 UNLOCKED", W / 2, H / 2 + 34);
         ctx.restore();
       }
 
@@ -386,14 +386,14 @@ export function InvadersGame() {
     }
 
     // Clue unlock confirmation
-    if (s.clue12ToastUntil && performance.now() < s.clue12ToastUntil) {
+    if (s.clue13ToastUntil && performance.now() < s.clue13ToastUntil) {
       ctx.save();
       ctx.shadowBlur = 18;
       ctx.shadowColor = "#00ffaa";
       ctx.fillStyle = "#00ffaa";
       ctx.font = "bold 18px 'Orbitron', monospace";
       ctx.textAlign = "center";
-      ctx.fillText("CLUE 12 UNLOCKED", W / 2, 32);
+      ctx.fillText("CLUE 13 UNLOCKED", W / 2, 32);
       ctx.restore();
     }
 

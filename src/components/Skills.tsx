@@ -87,7 +87,7 @@ const techCloud = [
   { name: "Event-Driven", weight: 1 },
 ];
 
-function SkillBar({ skill, index, clue7Found, onPercentClick }: { skill: typeof skills[0]; index: number; clue7Found?: boolean; onPercentClick?: () => void }) {
+function SkillBar({ skill, index, clue8Found, onPercentClick }: { skill: typeof skills[0]; index: number; clue8Found?: boolean; onPercentClick?: () => void }) {
   const [filled, setFilled] = useState(false);
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -160,14 +160,14 @@ function SkillBar({ skill, index, clue7Found, onPercentClick }: { skill: typeof 
           {skill.title}
         </span>
         <span
-          onClick={clue7Found && onPercentClick ? onPercentClick : undefined}
+          onClick={clue8Found && onPercentClick ? onPercentClick : undefined}
           style={{
             fontFamily: "var(--font-code)",
             fontSize: "0.6rem",
             letterSpacing: "1px",
             color: hovered ? skill.color : "var(--color-text-muted)",
             transition: "color 0.3s ease",
-            cursor: clue7Found ? "pointer" : "default",
+            cursor: clue8Found ? "pointer" : "default",
           }}
         >
           {skill.level}%
@@ -307,14 +307,14 @@ function TechCloud() {
 
 export function Skills() {
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
-  const clue7Found = isClueFound(7);
+  const clue8Found = isClueFound(8);
   const clickedPercentages = useRef(new Set<number>());
 
   const handlePercentClick = useCallback((index: number) => {
-    if (!canAttemptClue(8)) return;
+    if (!canAttemptClue(9)) return;
     clickedPercentages.current.add(index);
     if (clickedPercentages.current.size >= skills.length) {
-      unlockClue(8);
+      unlockClue(9);
       clickedPercentages.current.clear();
     }
   }, [canAttemptClue, unlockClue]);
@@ -395,7 +395,7 @@ export function Skills() {
           }}
         >
           {skills.map((skill, i) => (
-            <SkillBar key={skill.title} skill={skill} index={i} clue7Found={clue7Found} onPercentClick={() => handlePercentClick(i)} />
+            <SkillBar key={skill.title} skill={skill} index={i} clue8Found={clue8Found} onPercentClick={() => handlePercentClick(i)} />
           ))}
         </div>
 

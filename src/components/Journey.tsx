@@ -260,7 +260,7 @@ function FloatingDots() {
 const CLUE7_SEQUENCE = ["Y3", "Y1", "Y2"];
 
 // Desktop: alternating left/right timeline
-function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onYearClick?: (year: string) => void }) {
+function DesktopTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; onYearClick?: (year: string) => void }) {
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -361,7 +361,7 @@ function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; on
 
               {/* Center badge */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
-                <YearBadge item={item} clue6Found={clue6Found} onClick={() => onYearClick?.(item.year)} />
+                <YearBadge item={item} clue7Found={clue7Found} onClick={() => onYearClick?.(item.year)} />
               </div>
 
               {/* Right slot */}
@@ -388,10 +388,10 @@ function DesktopTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; on
   );
 }
 
-function YearBadge({ item, onClick, clue6Found }: { item: typeof timeline[0]; onClick?: () => void; clue6Found?: boolean }) {
+function YearBadge({ item, onClick, clue7Found }: { item: typeof timeline[0]; onClick?: () => void; clue7Found?: boolean }) {
   return (
     <div
-      onClick={clue6Found && onClick ? onClick : undefined}
+      onClick={clue7Found && onClick ? onClick : undefined}
       style={{
         width: "52px",
         height: "52px",
@@ -405,7 +405,7 @@ function YearBadge({ item, onClick, clue6Found }: { item: typeof timeline[0]; on
         position: "relative",
         zIndex: 2,
         animation: "badge-pulse 2.5s ease-in-out infinite",
-        cursor: clue6Found ? "pointer" : "default",
+        cursor: clue7Found ? "pointer" : "default",
       }}
     >
       <span
@@ -435,7 +435,7 @@ function YearBadge({ item, onClick, clue6Found }: { item: typeof timeline[0]; on
 }
 
 // Mobile: left-aligned vertical layout
-function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onYearClick?: (year: string) => void }) {
+function MobileTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; onYearClick?: (year: string) => void }) {
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -503,7 +503,7 @@ function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onY
           <div key={item.year} style={{ position: "relative" }}>
             {/* Badge on the line */}
             <div
-              onClick={clue6Found && onYearClick ? () => onYearClick(item.year) : undefined}
+              onClick={clue7Found && onYearClick ? () => onYearClick(item.year) : undefined}
               style={{
                 position: "absolute",
                 left: "-43px",
@@ -518,7 +518,7 @@ function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onY
                 justifyContent: "center",
                 boxShadow: `0 0 12px ${item.glowColor}`,
                 zIndex: 2,
-                cursor: clue6Found ? "pointer" : "default",
+                cursor: clue7Found ? "pointer" : "default",
               }}
             >
               <span
@@ -543,17 +543,17 @@ function MobileTimeline({ clue6Found, onYearClick }: { clue6Found?: boolean; onY
 
 export function Journey() {
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
-  const clue6Found = isClueFound(6);
+  const clue7Found = isClueFound(7);
   const yearSeqRef = useRef<string[]>([]);
 
   const handleYearClick = useCallback((year: string) => {
-    if (!canAttemptClue(7)) return;
+    if (!canAttemptClue(8)) return;
     const seq = yearSeqRef.current;
     seq.push(year);
     if (seq.length > 3) seq.splice(0, seq.length - 3);
     const last3 = seq.slice(-3);
     if (last3.length === 3 && last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])) {
-      unlockClue(7);
+      unlockClue(8);
       yearSeqRef.current = [];
     } else if (seq.length === 3 && !last3.every((y, idx) => y === CLUE7_SEQUENCE[idx])) {
       yearSeqRef.current = [];
@@ -630,12 +630,12 @@ export function Journey() {
 
         {/* Desktop layout */}
         <div className="hidden md:block">
-          <DesktopTimeline clue6Found={clue6Found} onYearClick={handleYearClick} />
+          <DesktopTimeline clue7Found={clue7Found} onYearClick={handleYearClick} />
         </div>
 
         {/* Mobile layout */}
         <div className="block md:hidden">
-          <MobileTimeline clue6Found={clue6Found} onYearClick={handleYearClick} />
+          <MobileTimeline clue7Found={clue7Found} onYearClick={handleYearClick} />
         </div>
       </div>
     </section>

@@ -15,8 +15,8 @@ const ROW_2 = [
   "Prometheus", "Grafana", "AWS", "Embedded Systems",
 ];
 
-// Six marquee items rendered slightly brighter after clue 4 is found.
-// Clicking all 6 (in any order) unlocks clue 5.
+// Six marquee items rendered slightly brighter after clue 5 is found.
+// Clicking all 6 (in any order) unlocks clue 6.
 const BRIGHT_ITEMS = new Set([
   "Docker",          // ROW_1
   "MQTT",            // ROW_1
@@ -30,11 +30,11 @@ interface MarqueeRowProps {
   items: string[];
   direction?: "left" | "right";
   speed?: number;
-  clue4Found?: boolean;
+  clue5Found?: boolean;
   onBrightClick?: (item: string) => void;
 }
 
-function MarqueeRow({ items, direction = "left", speed = 32, clue4Found, onBrightClick }: MarqueeRowProps) {
+function MarqueeRow({ items, direction = "left", speed = 32, clue5Found, onBrightClick }: MarqueeRowProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const doubled = [...items, ...items];
   const animName = direction === "left" ? "marquee-left" : "marquee-right";
@@ -65,7 +65,7 @@ function MarqueeRow({ items, direction = "left", speed = 32, clue4Found, onBrigh
         }}
       >
         {doubled.map((item, i) => {
-          const isBright = clue4Found && BRIGHT_ITEMS.has(item);
+          const isBright = clue5Found && BRIGHT_ITEMS.has(item);
           return (
             <span
               key={i}
@@ -94,14 +94,14 @@ function MarqueeRow({ items, direction = "left", speed = 32, clue4Found, onBrigh
 
 export function Marquee() {
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
-  const clue4Found = isClueFound(4);
+  const clue5Found = isClueFound(5);
   const clickedBright = useRef(new Set<string>());
 
   const handleBrightClick = useCallback((item: string) => {
-    if (!canAttemptClue(5)) return;
+    if (!canAttemptClue(6)) return;
     clickedBright.current.add(item);
     if (clickedBright.current.size >= BRIGHT_ITEMS.size) {
-      unlockClue(5);
+      unlockClue(6);
       clickedBright.current.clear();
     }
   }, [canAttemptClue, unlockClue]);
@@ -110,12 +110,12 @@ export function Marquee() {
     <div className="border-y border-border py-0 relative z-[1] overflow-hidden">
       {/* Row 1 — left */}
       <div className="gsap-marquee-row py-3 border-b border-border">
-        <MarqueeRow items={ROW_1} direction="left" speed={34} clue4Found={clue4Found} onBrightClick={handleBrightClick} />
+        <MarqueeRow items={ROW_1} direction="left" speed={34} clue5Found={clue5Found} onBrightClick={handleBrightClick} />
       </div>
 
       {/* Row 2 — right (opposite direction) */}
       <div className="gsap-marquee-row py-3">
-        <MarqueeRow items={ROW_2} direction="right" speed={28} clue4Found={clue4Found} onBrightClick={handleBrightClick} />
+        <MarqueeRow items={ROW_2} direction="right" speed={28} clue5Found={clue5Found} onBrightClick={handleBrightClick} />
       </div>
 
       <style>{`

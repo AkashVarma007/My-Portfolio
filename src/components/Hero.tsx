@@ -176,9 +176,9 @@ export function Hero() {
                 if (
                   last4.length === 4 &&
                   last4.every((l, idx) => l === CLUE3_SEQUENCE[idx]) &&
-                  canAttemptClue(3)
+                  canAttemptClue(4)
                 ) {
-                  unlockClue(3);
+                  unlockClue(4);
                   clickSeqRef.current = [];
                 }
               }}

@@ -27,13 +27,13 @@ export function AchievementWidget() {
   const nextClue = CLUES.find((c) => !isClueFound(c.id));
   let nextHint = nextClue ? nextClue.hint : "You've found all fragments. The end awaits.";
 
-  // Subtle nudge into the terminal once clue 12 is found and 13 isn't.
-  if (isClueFound(12) && !isClueFound(13)) {
+  // Subtle nudge into the terminal once clue 13 is found and 14 isn't.
+  if (isClueFound(13) && !isClueFound(14)) {
     nextHint = "The console is listening.";
   }
 
   // If the next clue is terminal-based, avoid revealing the passphrase here.
-  if (nextClue?.id === 14) {
+  if (nextClue?.id === 15) {
     nextHint = "The console awaits. Feed it the itch.";
   }
 
@@ -428,7 +428,7 @@ export function AchievementWidget() {
           )}
 
           {/* ── Console shortcut ── */}
-          {isClueFound(13) && (
+          {isClueFound(14) && (
             <div style={{ padding: "0 16px 16px" }}>
               <button
                 onClick={() => {

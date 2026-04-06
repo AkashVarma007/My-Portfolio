@@ -91,8 +91,8 @@ export function HiddenTerminal() {
         if (konamiProgress.current === KONAMI.length) {
           konamiProgress.current = 0;
           setOpen(true);
-          if (huntRef.current.canAttemptClue(13)) {
-            huntRef.current.unlockClue(13);
+          if (huntRef.current.canAttemptClue(14)) {
+            huntRef.current.unlockClue(14);
           }
         }
       } else {
@@ -142,7 +142,7 @@ export function HiddenTerminal() {
         case "clues": {
           const line1 = `Fragments collected: ${totalFound}`;
           pushOutput(line1);
-          if (isClueFound(14)) {
+          if (isClueFound(15)) {
             pushOutput(
               "Passphrase acquired. The door awaits at /secret."
             );
@@ -171,9 +171,9 @@ export function HiddenTerminal() {
           break;
 
         case "curiosity":
-          if (canAttemptClue(14)) {
-            const unlocked = unlockClue(14);
-            if (unlocked || isClueFound(14)) {
+          if (canAttemptClue(15)) {
+            const unlocked = unlockClue(15);
+            if (unlocked || isClueFound(15)) {
               pushOutput(
                 "ACCESS GRANTED. The path is open. Navigate to /secret to claim your reward.",
                 "system"
@@ -189,15 +189,15 @@ export function HiddenTerminal() {
           break;
 
         case "/secret":
-          if (isClueFound(14)) {
-            const unlocked = unlockClue(15);
-            if (unlocked || isClueFound(15)) {
+          if (isClueFound(15)) {
+            const unlocked = unlockClue(16);
+            if (unlocked || isClueFound(16)) {
               pushOutput(
-                "Fragment #15 collected. Open /secret in your browser.",
+                "Fragment #16 collected. Open /secret in your browser.",
                 "system"
               );
             } else {
-              pushOutput("Fragment #15 already collected. Open /secret.");
+              pushOutput("Fragment #16 already collected. Open /secret.");
             }
           } else {
             pushOutput(

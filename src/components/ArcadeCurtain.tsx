@@ -164,7 +164,7 @@ export function ArcadeCurtain() {
 
       {/* ══════════ CURTAIN ══════════ */}
       {phase !== "idle" && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 99500 }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200000 }}>
           {/* The curtain panel — drops from top */}
           <div
             style={{
@@ -180,68 +180,100 @@ export function ArcadeCurtain() {
           >
             {/* ── Background layers ── */}
 
-            {/* Perspective grid floor */}
+            {/* Perspective grid floor — bigger, more visible */}
             <div
               style={{
                 position: "absolute",
-                bottom: 0,
-                left: "-20%",
-                right: "-20%",
-                height: "55%",
-                background: `
-                  linear-gradient(rgba(255,45,85,0.05) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,45,85,0.05) 1px, transparent 1px)
-                `,
-                backgroundSize: "60px 60px",
-                transform: "perspective(500px) rotateX(55deg)",
+                bottom: 0, left: "-25%", right: "-25%",
+                height: "52%",
+                backgroundImage: `linear-gradient(rgba(255,45,85,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(255,45,85,0.09) 1px, transparent 1px)`,
+                backgroundSize: "55px 55px",
+                transform: "perspective(450px) rotateX(58deg)",
                 transformOrigin: "bottom center",
                 opacity: 0,
                 animation: sceneStep >= 1 ? "grid-fade-in 1s ease forwards" : undefined,
               }}
             />
 
-            {/* Radial glow at center-bottom */}
+            {/* Center vertical light pillar */}
             <div
               style={{
                 position: "absolute",
-                bottom: "10%",
-                left: "50%",
-                width: "80vw",
-                height: "40vh",
+                top: 0, bottom: 0,
+                left: "50%", width: 1,
                 transform: "translateX(-50%)",
-                background: `radial-gradient(ellipse 50% 60% at 50% 80%, rgba(255,45,85,0.12) 0%, transparent 70%)`,
+                background: `linear-gradient(to bottom, transparent 0%, rgba(255,45,85,0.12) 30%, rgba(255,107,45,0.18) 60%, transparent 100%)`,
+                pointerEvents: "none",
                 opacity: 0,
-                animation: sceneStep >= 1 ? "glow-pulse 2s ease-in-out infinite" : undefined,
-                animationDelay: "0.3s",
+                animation: sceneStep >= 1 ? "streak-in 1.2s ease forwards 0.15s" : undefined,
               }}
             />
 
-            {/* Scanlines */}
+            {/* Radial glow — center-bottom, bigger */}
             <div
               style={{
                 position: "absolute",
-                inset: 0,
-                background: "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(255,45,85,0.01) 3px, rgba(255,45,85,0.01) 4px)",
+                bottom: 0, left: "50%",
+                width: "100vw", height: "55vh",
+                transform: "translateX(-50%)",
+                background: `radial-gradient(ellipse 55% 65% at 50% 90%, rgba(255,45,85,0.18) 0%, rgba(255,107,45,0.06) 45%, transparent 70%)`,
+                opacity: 0,
+                animation: sceneStep >= 1 ? "glow-pulse 2.5s ease-in-out infinite" : undefined,
+                animationDelay: "0.2s",
+              }}
+            />
+
+            {/* Top ambient glow */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0, left: "50%",
+                width: "80vw", height: "30vh",
+                transform: "translateX(-50%)",
+                background: `radial-gradient(ellipse 60% 70% at 50% 0%, rgba(255,45,85,0.07) 0%, transparent 70%)`,
                 pointerEvents: "none",
               }}
             />
 
-            {/* Diagonal accent streaks */}
-            <div style={{ position: "absolute", top: "15%", left: "8%", width: 1, height: "35%", background: `linear-gradient(to bottom, transparent, rgba(255,45,85,0.08), transparent)`, transform: "skewX(-20deg)", opacity: 0, animation: sceneStep >= 1 ? "streak-in 0.8s ease forwards 0.2s" : undefined }} />
-            <div style={{ position: "absolute", top: "20%", right: "12%", width: 1, height: "30%", background: `linear-gradient(to bottom, transparent, rgba(255,107,45,0.06), transparent)`, transform: "skewX(15deg)", opacity: 0, animation: sceneStep >= 1 ? "streak-in 0.8s ease forwards 0.35s" : undefined }} />
-            <div style={{ position: "absolute", top: "10%", left: "35%", width: 1, height: "25%", background: `linear-gradient(to bottom, transparent, rgba(255,45,85,0.04), transparent)`, transform: "skewX(-8deg)", opacity: 0, animation: sceneStep >= 1 ? "streak-in 0.8s ease forwards 0.5s" : undefined }} />
-            <div style={{ position: "absolute", top: "25%", right: "30%", width: 1, height: "20%", background: `linear-gradient(to bottom, transparent, rgba(255,107,45,0.05), transparent)`, transform: "skewX(12deg)", opacity: 0, animation: sceneStep >= 1 ? "streak-in 0.8s ease forwards 0.4s" : undefined }} />
-
-            {/* Bottom edge glow */}
+            {/* Scanlines — more visible */}
             <div
               style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
+                position: "absolute", inset: 0,
+                backgroundImage: "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Diagonal accent streaks — more of them */}
+            {[
+              { top: "12%", left:  "5%",  h: "40%", skew: "-22deg", delay: "0.10s", alpha: "0.10" },
+              { top: "18%", right: "7%",  h: "32%", skew:  "18deg", delay: "0.20s", alpha: "0.08" },
+              { top:  "8%", left: "28%",  h: "28%", skew:  "-8deg", delay: "0.30s", alpha: "0.06" },
+              { top: "22%", right:"25%",  h: "22%", skew:  "12deg", delay: "0.15s", alpha: "0.07" },
+              { top: "30%", left: "15%",  h: "18%", skew: "-14deg", delay: "0.25s", alpha: "0.05" },
+              { top: "15%", right:"40%",  h: "26%", skew:   "6deg", delay: "0.35s", alpha: "0.05" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  top: s.top, left: "left" in s ? s.left : undefined, right: "right" in s ? s.right : undefined,
+                  width: 1, height: s.h,
+                  background: `linear-gradient(to bottom, transparent, rgba(255,${i % 2 === 0 ? "45,85" : "107,45"},${s.alpha}), transparent)`,
+                  transform: `skewX(${s.skew})`,
+                  opacity: 0,
+                  animation: sceneStep >= 1 ? `streak-in 0.9s ease forwards ${s.delay}` : undefined,
+                }}
+              />
+            ))}
+
+            {/* Bottom edge glow — stronger */}
+            <div
+              style={{
+                position: "absolute", bottom: 0, left: 0, right: 0,
                 height: 3,
-                background: `linear-gradient(90deg, transparent 5%, ${RED}, ${ORANGE}, ${RED}, transparent 95%)`,
-                boxShadow: `0 0 20px 4px rgba(255,45,85,0.4), 0 0 60px 8px rgba(255,45,85,0.15)`,
+                background: `linear-gradient(90deg, transparent 2%, ${RED}, ${ORANGE}, ${RED}, transparent 98%)`,
+                boxShadow: `0 0 30px 6px rgba(255,45,85,0.5), 0 0 80px 12px rgba(255,45,85,0.15)`,
               }}
             />
 
@@ -274,7 +306,7 @@ export function ArcadeCurtain() {
               </>
             )}
 
-            {/* ── Center content: emblem + text ── */}
+            {/* ── Center content: neon marquee ── */}
             <div
               style={{
                 position: "absolute",
@@ -284,184 +316,211 @@ export function ArcadeCurtain() {
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 10,
+                padding: "0 5vw",
               }}
             >
-              {/* Hexagonal emblem */}
+              {/* Top marquee bar */}
               {sceneStep >= 1 && (
                 <div
                   style={{
-                    width: 80,
-                    height: 80,
-                    marginBottom: 28,
-                    position: "relative",
-                    animation: "emblem-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                    display: "flex", alignItems: "center", gap: 16,
+                    width: "100%", maxWidth: 820, marginBottom: 24,
+                    opacity: 0,
+                    animation: "emblem-in 0.5s ease forwards 0.1s",
                   }}
                 >
-                  {/* Outer hex ring */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      clipPath: "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)",
-                      background: `linear-gradient(135deg, rgba(255,45,85,0.2), rgba(255,107,45,0.1))`,
-                      animation: "hex-rotate 6s linear infinite",
-                    }}
-                  />
-                  {/* Inner hex */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 8,
-                      clipPath: "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)",
-                      background: `linear-gradient(135deg, rgba(255,45,85,0.08), rgba(255,107,45,0.04))`,
-                    }}
-                  />
-                  {/* Center diamond */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 16,
-                        height: 16,
-                        background: `linear-gradient(135deg, ${RED}, ${ORANGE})`,
-                        clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                        filter: "drop-shadow(0 0 10px rgba(255,45,85,0.6))",
-                        animation: "diamond-pulse 1.5s ease-in-out infinite",
-                      }}
-                    />
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${RED})` }} />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[RED, ORANGE, RED].map((c, i) => (
+                      <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: c, boxShadow: `0 0 6px ${c}, 0 0 12px ${c}` }} />
+                    ))}
                   </div>
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${ORANGE}, transparent)` }} />
                 </div>
               )}
 
-              {/* ARCADE text with glitch effect */}
-              {sceneStep >= 2 && (
-                <div style={{ position: "relative", marginBottom: 12 }}>
-                  {/* Glitch layers */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      fontFamily: "var(--font-orbitron, monospace)",
-                      fontSize: "clamp(28px, 6vw, 52px)",
-                      fontWeight: 900,
-                      letterSpacing: 16,
-                      color: "rgba(255,45,85,0.4)",
-                      animation: "glitch-1 0.3s ease-in-out 2",
-                      clipPath: "inset(0 0 65% 0)",
-                    }}
-                  >
-                    ARCADE
-                  </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      fontFamily: "var(--font-orbitron, monospace)",
-                      fontSize: "clamp(28px, 6vw, 52px)",
-                      fontWeight: 900,
-                      letterSpacing: 16,
-                      color: "rgba(255,107,45,0.3)",
-                      animation: "glitch-2 0.3s ease-in-out 2",
-                      clipPath: "inset(65% 0 0 0)",
-                    }}
-                  >
-                    ARCADE
-                  </div>
-                  {/* Main text */}
-                  <div
-                    style={{
-                      fontFamily: "var(--font-orbitron, monospace)",
-                      fontSize: "clamp(28px, 6vw, 52px)",
-                      fontWeight: 900,
-                      letterSpacing: 16,
-                      background: `linear-gradient(135deg, ${RED}, ${ORANGE})`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      filter: "drop-shadow(0 0 24px rgba(255,45,85,0.3))",
-                      animation: "text-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-                    }}
-                  >
-                    ARCADE
-                  </div>
+              {/* PLAYER 1 label */}
+              {sceneStep >= 1 && (
+                <div
+                  style={{
+                    fontFamily: "var(--font-orbitron, monospace)",
+                    fontSize: "clamp(9px, 1.1vw, 13px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.55em",
+                    color: ORANGE,
+                    textTransform: "uppercase",
+                    marginBottom: 18,
+                    opacity: 0,
+                    animation: "emblem-in 0.5s ease forwards 0.2s",
+                    textShadow: `0 0 12px ${ORANGE}88`,
+                  }}
+                >
+                  ▶ &nbsp; PLAYER 1 &nbsp; ◀
                 </div>
               )}
 
-              {/* Accent lines + subtitle */}
+              {/* ARCADE neon title */}
               {sceneStep >= 2 && (
-                <div style={{ width: 80, height: 1, background: `linear-gradient(90deg, transparent, ${RED}, ${ORANGE}, transparent)`, animation: "line-expand 0.6s ease-out forwards", marginBottom: 16 }} />
+                <div style={{ position: "relative", lineHeight: 1 }}>
+                  {/* Glitch layer 1 */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute", inset: 0,
+                      fontFamily: "var(--font-orbitron, monospace)",
+                      fontSize: "clamp(80px, 14vw, 148px)",
+                      fontWeight: 900,
+                      letterSpacing: "0.06em",
+                      color: RED,
+                      animation: "glitch-1 0.35s ease-in-out 2",
+                      clipPath: "inset(0 0 60% 0)",
+                      whiteSpace: "nowrap",
+                      opacity: 0.5,
+                    }}
+                  >ARCADE</div>
+                  {/* Glitch layer 2 */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute", inset: 0,
+                      fontFamily: "var(--font-orbitron, monospace)",
+                      fontSize: "clamp(80px, 14vw, 148px)",
+                      fontWeight: 900,
+                      letterSpacing: "0.06em",
+                      color: ORANGE,
+                      animation: "glitch-2 0.35s ease-in-out 2",
+                      clipPath: "inset(60% 0 0 0)",
+                      whiteSpace: "nowrap",
+                      opacity: 0.4,
+                    }}
+                  >ARCADE</div>
+                  {/* Main neon text */}
+                  <div
+                    style={{
+                      fontFamily: "var(--font-orbitron, monospace)",
+                      fontSize: "clamp(80px, 14vw, 148px)",
+                      fontWeight: 900,
+                      letterSpacing: "0.06em",
+                      whiteSpace: "nowrap",
+                      color: "#fff",
+                      textShadow: `
+                        0 0 7px #fff,
+                        0 0 10px #fff,
+                        0 0 21px #fff,
+                        0 0 42px ${RED},
+                        0 0 82px ${RED},
+                        0 0 92px ${RED},
+                        0 0 102px ${RED}
+                      `,
+                      animation: "neon-flicker 0.5s ease forwards, neon-steady 3s ease-in-out infinite 0.6s",
+                    }}
+                  >ARCADE</div>
+                </div>
               )}
 
+              {/* Bottom marquee bar */}
+              {sceneStep >= 2 && (
+                <div
+                  style={{
+                    display: "flex", alignItems: "center", gap: 16,
+                    width: "100%", maxWidth: 820, marginTop: 28,
+                    animation: "subtitle-in 0.5s ease forwards",
+                  }}
+                >
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.12))` }} />
+                  <span style={{
+                    fontFamily: "var(--font-rajdhani, sans-serif)",
+                    fontSize: "clamp(9px, 1.1vw, 13px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.5em",
+                    color: "rgba(255,255,255,0.22)",
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                  }}>
+                    AKASH · VARMA
+                  </span>
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, rgba(255,255,255,0.12), transparent)` }} />
+                </div>
+              )}
+
+              {/* Loading + INSERT COIN */}
               {sceneStep >= 3 && (
-                <>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, marginTop: 32, animation: "subtitle-in 0.5s ease forwards" }}>
+                  {/* Progress bar */}
                   <div
                     style={{
-                      fontFamily: "var(--font-rajdhani, sans-serif)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      letterSpacing: 6,
-                      color: "rgba(255,255,255,0.3)",
-                      textTransform: "uppercase",
-                      animation: "subtitle-in 0.5s ease forwards",
-                      marginBottom: 24,
-                    }}
-                  >
-                    Entering the Grid
-                  </div>
-
-                  {/* Loading bar */}
-                  <div
-                    style={{
-                      width: 160,
-                      height: 2,
-                      borderRadius: 1,
-                      background: "rgba(255,255,255,0.06)",
+                      width: "min(280px, 45vw)",
+                      height: 3,
+                      background: "rgba(255,255,255,0.07)",
+                      borderRadius: 2,
                       overflow: "hidden",
+                      position: "relative",
                     }}
                   >
                     <div
                       style={{
                         height: "100%",
-                        borderRadius: 1,
-                        background: `linear-gradient(90deg, ${RED}, ${ORANGE})`,
-                        animation: "load-bar 1.2s ease-in-out forwards",
-                        boxShadow: `0 0 8px rgba(255,45,85,0.4)`,
+                        background: `linear-gradient(90deg, ${RED}, ${ORANGE}, #fff)`,
+                        animation: "load-bar 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+                        boxShadow: `0 0 10px ${RED}88`,
+                        borderRadius: 2,
                       }}
                     />
                   </div>
-                </>
+
+                  {/* INSERT COIN */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 20, height: 1, background: `rgba(255,45,85,0.3)` }} />
+                    <span
+                      style={{
+                        fontFamily: "var(--font-orbitron, monospace)",
+                        fontSize: "clamp(8px, 1vw, 11px)",
+                        fontWeight: 700,
+                        letterSpacing: "0.45em",
+                        color: RED,
+                        textTransform: "uppercase",
+                        animation: "curtain-blink 0.85s ease-in-out infinite",
+                        textShadow: `0 0 10px ${RED}`,
+                      }}
+                    >
+                      INSERT COIN
+                    </span>
+                    <div style={{ width: 20, height: 1, background: `rgba(255,45,85,0.3)` }} />
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Corner accents */}
+            {/* ── Corner brackets ── */}
             {sceneStep >= 1 && (
               <>
-                {/* Top-left */}
-                <div style={{ position: "absolute", top: 24, left: 24, opacity: 0, animation: "corner-in 0.5s ease forwards 0.3s" }}>
-                  <div style={{ width: 24, height: 1, background: `rgba(255,45,85,0.3)` }} />
-                  <div style={{ width: 1, height: 24, background: `rgba(255,45,85,0.3)` }} />
-                </div>
-                {/* Top-right */}
-                <div style={{ position: "absolute", top: 24, right: 24, opacity: 0, animation: "corner-in 0.5s ease forwards 0.4s", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                  <div style={{ width: 24, height: 1, background: `rgba(255,107,45,0.3)` }} />
-                  <div style={{ width: 1, height: 24, background: `rgba(255,107,45,0.3)`, alignSelf: "flex-end" }} />
-                </div>
-                {/* Bottom-left */}
-                <div style={{ position: "absolute", bottom: 24, left: 24, opacity: 0, animation: "corner-in 0.5s ease forwards 0.5s", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                  <div style={{ width: 1, height: 24, background: `rgba(255,107,45,0.3)` }} />
-                  <div style={{ width: 24, height: 1, background: `rgba(255,107,45,0.3)` }} />
-                </div>
-                {/* Bottom-right */}
-                <div style={{ position: "absolute", bottom: 24, right: 24, opacity: 0, animation: "corner-in 0.5s ease forwards 0.6s", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "flex-end" }}>
-                  <div style={{ width: 1, height: 24, background: `rgba(255,45,85,0.3)`, alignSelf: "flex-end" }} />
-                  <div style={{ width: 24, height: 1, background: `rgba(255,45,85,0.3)` }} />
-                </div>
+                {[
+                  { top: 20, left: 20, bt: true, bl: true },
+                  { top: 20, right: 20, bt: true, br: true },
+                  { bottom: 20, left: 20, bb: true, bl: true },
+                  { bottom: 20, right: 20, bb: true, br: true },
+                ].map((c, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      position: "absolute",
+                      width: 36, height: 36,
+                      top: "top" in c ? c.top : undefined,
+                      bottom: "bottom" in c ? c.bottom : undefined,
+                      left: "left" in c ? c.left : undefined,
+                      right: "right" in c ? c.right : undefined,
+                      borderTop: "bt" in c && c.bt ? `2px solid rgba(255,45,85,0.55)` : undefined,
+                      borderBottom: "bb" in c && c.bb ? `2px solid rgba(255,45,85,0.55)` : undefined,
+                      borderLeft: "bl" in c && c.bl ? `2px solid rgba(255,45,85,0.55)` : undefined,
+                      borderRight: "br" in c && c.br ? `2px solid rgba(255,45,85,0.55)` : undefined,
+                      opacity: 0,
+                      animation: `corner-in 0.5s ease forwards ${0.25 + i * 0.08}s`,
+                      boxShadow: i % 2 === 0
+                        ? `inset 2px 2px 6px rgba(255,45,85,0.15)`
+                        : `inset -2px 2px 6px rgba(255,107,45,0.15)`,
+                    }}
+                  />
+                ))}
               </>
             )}
           </div>
@@ -508,18 +567,34 @@ export function ArcadeCurtain() {
         }
 
         @keyframes emblem-in {
-          from { opacity: 0; transform: scale(0.6); }
-          to   { opacity: 1; transform: scale(1); }
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes hex-rotate {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes curtain-blink {
+          0%, 45%  { opacity: 1; }
+          50%      { opacity: 0.05; }
+          55%, 100%{ opacity: 1; }
         }
 
         @keyframes diamond-pulse {
           0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255,45,85,0.6)); }
           50%      { transform: scale(1.15); filter: drop-shadow(0 0 16px rgba(255,45,85,0.9)); }
+        }
+
+        @keyframes neon-flicker {
+          0%   { opacity: 0; }
+          10%  { opacity: 1; }
+          11%  { opacity: 0.4; }
+          14%  { opacity: 1; }
+          15%  { opacity: 0.6; }
+          18%  { opacity: 1; }
+          100% { opacity: 1; }
+        }
+
+        @keyframes neon-steady {
+          0%, 100% { text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #ff2d55, 0 0 82px #ff2d55, 0 0 92px #ff2d55, 0 0 102px #ff2d55; }
+          50%      { text-shadow: 0 0 4px #fff, 0 0 7px #fff, 0 0 13px #fff, 0 0 30px #ff2d55, 0 0 60px #ff2d55, 0 0 70px #ff2d55, 0 0 80px #ff2d55; }
         }
 
         @keyframes text-in {
@@ -545,7 +620,7 @@ export function ArcadeCurtain() {
 
         @keyframes line-expand {
           from { width: 0; opacity: 0; }
-          to   { width: 80px; opacity: 1; }
+          to   { width: 100%; opacity: 1; }
         }
 
         @keyframes subtitle-in {

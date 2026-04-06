@@ -17,7 +17,7 @@ const TEXT_LINES: (string | null)[] = [
   "You kept going.",
   "Good.",
   null,
-  "There are 15 fragments hidden across this site.",
+  "There are 16 fragments hidden across this site.",
   "In the code. In the games.",
   "In places you haven't looked yet.",
   null,
@@ -25,7 +25,7 @@ const TEXT_LINES: (string | null)[] = [
   "Decode them all, and you'll find something",
   "meant for very few people.",
   null,
-  "Here is your first fragment.",
+  "Here is your next fragment.",
 ];
 
 // ---------------------------------------------------------------------------
@@ -101,16 +101,16 @@ function ScrollLine({ text, onVisible }: ScrollLineProps) {
 export function VoidSection() {
   const { unlockClue, isClueFound, canAttemptClue } = useHunt();
 
-  const clue1Found = isClueFound(1);
   const clue2Found = isClueFound(2);
-  const canAttemptClue2 = canAttemptClue(2);
+  const clue3Found = isClueFound(3);
+  const canAttemptClue3 = canAttemptClue(3);
 
-  const [clue1ButtonVisible, setClue1ButtonVisible] = useState(false);
-  const [clue2Decoded, setClue2Decoded] = useState(false);
+  const [clue2ButtonVisible, setClue2ButtonVisible] = useState(false);
+  const [clue3Decoded, setClue3Decoded] = useState(false);
 
   const clue1Ref = useRef<HTMLDivElement>(null);
 
-  // Observe when last text line becomes visible to show clue 1 button
+  // Observe when last text line becomes visible to show clue 2 button
   useEffect(() => {
     const el = clue1Ref.current;
     if (!el) return;
@@ -118,7 +118,7 @@ export function VoidSection() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setClue1ButtonVisible(true);
+          setClue2ButtonVisible(true);
           observer.disconnect();
         }
       },
@@ -129,16 +129,16 @@ export function VoidSection() {
     return () => observer.disconnect();
   }, []);
 
-  function handleClue1Click() {
-    unlockClue(1);
+  function handleClue2Click() {
+    unlockClue(2);
   }
 
-  function handleClue2Click() {
-    if (!clue2Found) {
-      unlockClue(2);
-      setClue2Decoded(true);
+  function handleClue3Click() {
+    if (!clue3Found) {
+      unlockClue(3);
+      setClue3Decoded(true);
     } else {
-      setClue2Decoded((prev) => !prev);
+      setClue3Decoded((prev) => !prev);
     }
   }
 
@@ -198,18 +198,18 @@ export function VoidSection() {
         {/* Clue 1 trigger sentinel — becomes visible after last line */}
         <div ref={clue1Ref} style={{ minHeight: "60px" }} />
 
-        {/* Clue 1 button */}
+        {/* Clue 2 button */}
         <div
           style={{
             minHeight: "120px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: clue1ButtonVisible ? 1 : 0,
+            opacity: clue2ButtonVisible ? 1 : 0,
             transition: "opacity 1.2s ease",
           }}
         >
-          {clue1Found ? (
+          {clue2Found ? (
             <div
               style={{
                 fontFamily: "var(--font-orbitron), monospace",
@@ -221,11 +221,11 @@ export function VoidSection() {
                 textAlign: "center",
               }}
             >
-              FRAGMENT #1 COLLECTED
+              FRAGMENT #2 COLLECTED
             </div>
           ) : (
             <button
-              onClick={handleClue1Click}
+              onClick={handleClue2Click}
               style={{
                 background: "transparent",
                 border: `1px solid ${RED}`,
@@ -250,13 +250,13 @@ export function VoidSection() {
                 btn.style.background = "transparent";
               }}
             >
-              ◆ COLLECT FRAGMENT #1
+              ◆ COLLECT FRAGMENT #2
             </button>
           )}
         </div>
 
-        {/* Clue 2 — only visible after clue 1 is collected */}
-        {canAttemptClue2 && (
+        {/* Clue 3 — only visible after clue 2 is collected */}
+        {canAttemptClue3 && (
           <div
             style={{
               minHeight: "160px",
@@ -270,7 +270,7 @@ export function VoidSection() {
           >
             {/* Flickering clue text */}
             <button
-              onClick={handleClue2Click}
+              onClick={handleClue3Click}
               aria-label="Decode the flickering message"
               style={{
                 background: "none",
@@ -297,8 +297,8 @@ export function VoidSection() {
               </p>
             </button>
 
-            {/* Decoded message — shown after clue 2 is clicked */}
-            {(clue2Found || clue2Decoded) && (
+            {/* Decoded message — shown after clue 3 is clicked */}
+            {(clue3Found || clue3Decoded) && (
               <div
                 style={{
                   maxWidth: "400px",

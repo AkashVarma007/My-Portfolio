@@ -52,7 +52,7 @@ interface GameState {
   bricks: Brick[][];
   score: number;
   keys: Set<string>;
-  clue9Unlocked: boolean;
+  clue10Unlocked: boolean;
 }
 
 function buildBricks(): Brick[][] {
@@ -88,7 +88,7 @@ function makeInitialState(): GameState {
     bricks: buildBricks(),
     score: 0,
     keys: new Set(),
-    clue9Unlocked: false,
+    clue10Unlocked: false,
   };
 }
 
@@ -226,9 +226,9 @@ export function BreakoutGame() {
         setPhase("win");
 
         // Clue 9 trigger on win
-        if (!s.clue9Unlocked && canAttemptClue(9)) {
-          const unlocked = unlockClue(9);
-          if (unlocked) s.clue9Unlocked = true;
+        if (!s.clue10Unlocked && canAttemptClue(10)) {
+          const unlocked = unlockClue(10);
+          if (unlocked) s.clue10Unlocked = true;
         }
       }
     }

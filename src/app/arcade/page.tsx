@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { HuntProvider } from "@/context/HuntContext";
+import { HuntProvider, useHunt } from "@/context/HuntContext";
 import { ArcadeSection } from "@/components/arcade/ArcadeSection";
 import { VoidSection } from "@/components/void/VoidSection";
 import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
 import { HiddenTerminal } from "@/components/hunt/HiddenTerminal";
+
+// Auto-unlocks clue 1 ("Enter the Arcade") when the user arrives at /arcade
+function ArcadeEntryEffect() {
+  const { unlockClue } = useHunt();
+  useEffect(() => {
+    unlockClue(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
 
 const RED = "#ff2d55";
 const ORANGE = "#ff6b2d";
@@ -42,6 +52,7 @@ export default function ArcadePage() {
 
   return (
     <HuntProvider>
+      <ArcadeEntryEffect />
       <ArcadeSection />
       <VoidSection />
       <AchievementWidget />
@@ -54,7 +65,7 @@ export default function ArcadePage() {
           style={{
             position: "fixed",
             inset: 0,
-            zIndex: 99500,
+            zIndex: 200000,
             pointerEvents: reveal === "curtain" ? "all" : "none",
           }}
         >

@@ -182,7 +182,7 @@ export function About() {
                       </div>
                     );
                   })}
-                  {isClueFound(3) && (
+                  {isClueFound(4) && (
                     <div
                       className="terminal-line"
                       style={{
@@ -191,7 +191,7 @@ export function About() {
                         opacity: 0,
                       } as React.CSSProperties}
                       onClick={() => {
-                        if (canAttemptClue(4)) unlockClue(4);
+                        if (canAttemptClue(5)) unlockClue(5);
                       }}
                     >
                       &nbsp;&nbsp;

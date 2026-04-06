@@ -64,6 +64,8 @@ export function AnimationProvider() {
     // ── Section heading clip-path reveals ────────────────────────────
     const headings = document.querySelectorAll<HTMLElement>("h2");
     headings.forEach((h) => {
+      // Skip h2s inside #contact — animated by the contact section stagger
+      if (h.closest("#contact")) return;
       gsap.set(h, { clipPath: "inset(0 100% 0 0)", opacity: 0 });
       ScrollTrigger.create({
         trigger: h,
@@ -136,21 +138,27 @@ export function AnimationProvider() {
       });
     }
 
-    // ── Contact section wave stagger ─────────────────────────────────
+    // ── Contact section coordinated reveal ───────────────────────────
     const contactSection = document.querySelector<HTMLElement>("#contact");
     if (contactSection) {
-      const contactEls = contactSection.querySelectorAll<HTMLElement>(".gsap-fade-up, .fade-up-element");
-      contactEls.forEach((el, i) => {
-        gsap.set(el, { opacity: 0, y: 40 });
+      const contactEls = contactSection.querySelectorAll<HTMLElement>(".fade-up-element");
+      if (contactEls.length > 0) {
+        gsap.set(contactEls, { opacity: 0, y: 35 });
         ScrollTrigger.create({
-          trigger: el,
-          start: "top 88%",
+          trigger: contactSection,
+          start: "top 72%",
           toggleActions: "play none none none",
           onEnter: () => {
-            gsap.to(el, { opacity: 1, y: 0, duration: 0.8, delay: i * 0.15, ease: "power3.out" });
+            gsap.to(contactEls, {
+              opacity: 1,
+              y: 0,
+              duration: 0.85,
+              stagger: 0.14,
+              ease: "power3.out",
+            });
           },
         });
-      });
+      }
     }
 
     // ── Hero lines dramatic stagger on load ───────────────────────────
@@ -171,22 +179,6 @@ export function AnimationProvider() {
       );
     }
 
-    // ── Hero parallax pin feel ────────────────────────────────────────
-    const heroSection = document.querySelector<HTMLElement>("#hero-section");
-    if (heroSection) {
-      tweens.push(
-        gsap.to(heroSection, {
-          y: "15%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroSection,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1,
-          },
-        })
-      );
-    }
 
     // ── About text paragraphs stagger ────────────────────────────────
     const aboutTexts = document.querySelectorAll<HTMLElement>(".gsap-about-text");
@@ -202,23 +194,6 @@ export function AnimationProvider() {
       });
     });
 
-    // ── Marquee horizontal speed modulation on scroll ─────────────────
-    const marqueeRows = document.querySelectorAll<HTMLElement>(".gsap-marquee-row");
-    marqueeRows.forEach((row, i) => {
-      const dir = i % 2 === 0 ? 1 : -1;
-      tweens.push(
-        gsap.to(row, {
-          x: `${dir * 80}px`,
-          ease: "none",
-          scrollTrigger: {
-            trigger: row.closest("section") ?? row,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1.5,
-          },
-        })
-      );
-    });
 
     // ── Refresh after setup ───────────────────────────────────────────
     ScrollTrigger.refresh();

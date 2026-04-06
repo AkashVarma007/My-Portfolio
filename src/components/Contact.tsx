@@ -12,7 +12,7 @@ export function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
-  const clue9Found = isClueFound(9);
+  const clue10Found = isClueFound(10);
 
   // Track mouse for interactive glow
   useEffect(() => {
@@ -105,7 +105,7 @@ export function Contact() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
           {/* Left — form */}
-          <div className="fade-up-element" style={{ transitionDelay: "0.1s" }}>
+          <div className="fade-up-element">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
               <InputField
                 id="name"
@@ -185,7 +185,7 @@ export function Contact() {
           </div>
 
           {/* Right — info cards + map */}
-          <div className="fade-up-element space-y-5" style={{ transitionDelay: "0.18s" }}>
+          <div className="fade-up-element space-y-5">
             {/* Map card */}
             <div className="relative rounded-2xl overflow-hidden border border-border-light h-[220px]">
               <iframe
@@ -202,13 +202,13 @@ export function Contact() {
                   Hyderabad, India
                 </span>
               </div>
-              {/* Hidden Easter egg dot — only interactive after clue 9 */}
-              {clue9Found && (
+              {/* Hidden Easter egg dot — only interactive after clue 10 */}
+              {clue10Found && (
                 <div
                   onClick={() => {
-                    // Debug: confirm click registration for clue 10
-                    console.log("[clue10] map dot clicked");
-                    if (canAttemptClue(10)) unlockClue(10);
+                    // Debug: confirm click registration for clue 11
+                    console.log("[clue11] map dot clicked");
+                    if (canAttemptClue(11)) unlockClue(11);
                   }}
                   style={{
                     position: "absolute",

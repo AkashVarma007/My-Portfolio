@@ -48,14 +48,14 @@ export default function SecretPage() {
 
   useEffect(() => {
     const state = loadHuntState();
-    // If clue 14 is done, visiting /secret grants clue 15.
-    if (state.cluesFound.includes(14) && !state.cluesFound.includes(15)) {
-      const next = { ...state, cluesFound: [...state.cluesFound, 15] };
+    // If clue 15 is done, visiting /secret grants clue 16.
+    if (state.cluesFound.includes(15) && !state.cluesFound.includes(16)) {
+      const next = { ...state, cluesFound: [...state.cluesFound, 16] };
       saveHuntState(next);
       setAuthorized(true);
       return;
     }
-    setAuthorized(state.cluesFound.includes(15));
+    setAuthorized(state.cluesFound.includes(16));
   }, []);
 
   // Hydration guard — show nothing until we've read localStorage
@@ -134,7 +134,7 @@ export default function SecretPage() {
           marginBottom: 28,
         }}
       >
-        ALL 15 FRAGMENTS FOUND
+        ALL 16 FRAGMENTS FOUND
       </div>
 
       {/* Title */}
@@ -233,7 +233,7 @@ export default function SecretPage() {
               color: "rgba(255,45,85,0.7)",
             }}
           >
-            Fragment 15
+            Fragment 16
           </span>{" "}
           so Akash knows you made it here.
         </p>

@@ -189,14 +189,14 @@ export function SnakeGame() {
       setDisplayScore(scoreRef.current);
       foodRef.current = randomFood(newSnake);
 
-      // Clue 6 trigger at exactly score 42
+      // Clue 7 trigger at exactly score 42
       if (
         scoreRef.current === 42 &&
         !clue6TriggeredRef.current &&
-        canAttemptClue(6)
+        canAttemptClue(7)
       ) {
         clue6TriggeredRef.current = true;
-        unlockClue(6);
+        unlockClue(7);
       }
     }
   }, [updateGameScore, unlockClue, canAttemptClue]);

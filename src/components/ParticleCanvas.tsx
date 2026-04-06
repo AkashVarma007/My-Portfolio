@@ -99,7 +99,7 @@ export function ParticleCanvas() {
     function draw() {
       const now = performance.now();
       const { canAttemptClue, isClueFound, unlockClue } = huntRef.current;
-      const clue11Active = canAttemptClue(11) && !isClueFound(11);
+      const clue11Active = canAttemptClue(12) && !isClueFound(12);
       if (clue11Active) {
         if (!messageVisible && now >= nextMessageAt) {
           messageVisible = true;
@@ -210,8 +210,8 @@ export function ParticleCanvas() {
     function onClick() {
       if (!messageVisible) return;
       const { canAttemptClue, isClueFound, unlockClue } = huntRef.current;
-      if (canAttemptClue(11) && !isClueFound(11)) {
-        unlockClue(11);
+      if (canAttemptClue(12) && !isClueFound(12)) {
+        unlockClue(12);
         messageVisible = false;
         nextMessageAt = performance.now() + 20000;
       }
