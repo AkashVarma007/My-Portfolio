@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
@@ -59,7 +59,8 @@ export function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="py-28 md:py-40 relative z-[1] overflow-hidden"
+      className="relative z-[1] overflow-hidden"
+      style={{ padding: "clamp(80px, 10vw, 140px) 0" }}
     >
       {/* Interactive mouse-following glow */}
       <div
@@ -89,23 +90,99 @@ export function Contact() {
         }}
       />
 
-      <div className="max-w-[1300px] mx-auto px-6 md:px-12 relative">
+      {/* Giant background "05" */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-5%",
+          right: "-2%",
+          fontFamily: "var(--font-display)",
+          fontWeight: 900,
+          fontSize: "clamp(10rem, 28vw, 26rem)",
+          lineHeight: 0.85,
+          letterSpacing: "-8px",
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(255,255,255,0.04)",
+          pointerEvents: "none",
+          userSelect: "none",
+          zIndex: 0,
+        }}
+      >
+        05
+      </div>
+
+      <div className="max-w-[1300px] mx-auto relative" style={{ padding: "0 clamp(24px, 5vw, 64px)", zIndex: 1 }}>
         {/* Header */}
-        <div className="fade-up-element mb-16">
-          <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-text-muted block mb-4">
-            05 / Contact
-          </span>
-          <h2 className="font-display text-[clamp(2rem,5vw,4rem)] font-extrabold tracking-[-2px] leading-[1.05]">
-            Let&rsquo;s build something
-            <br />
-            <span className="serif-italic font-normal">together</span>
-            <span className="text-accent">.</span>
+        <div className="mb-16 gsap-fade-up">
+          <div className="flex items-baseline gap-4 mb-4">
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                fontWeight: 300,
+                color: "rgba(255,255,255,0.12)",
+                lineHeight: 1,
+              }}
+            >
+              /
+            </span>
+            <span
+              className="gsap-section-num"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 900,
+                fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                color: "var(--color-text)",
+                lineHeight: 0.85,
+                letterSpacing: "-4px",
+              }}
+            >
+              05
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-code)",
+                fontSize: "0.55rem",
+                letterSpacing: "4px",
+                textTransform: "uppercase",
+                color: "var(--color-text-muted)",
+                alignSelf: "center",
+              }}
+            >
+              Contact
+            </span>
+          </div>
+
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 900,
+              fontSize: "clamp(2.4rem, 7vw, 6.5rem)",
+              color: "var(--color-text)",
+              lineHeight: 0.9,
+              letterSpacing: "-3px",
+            }}
+          >
+            Let&rsquo;s build{" "}
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 300,
+                letterSpacing: "-2px",
+              }}
+            >
+              together
+            </span>
+            <span style={{ color: "var(--color-accent)" }}>.</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 gsap-fade-up" style={{ "--delay": "0.1s" } as React.CSSProperties}>
           {/* Left — form */}
-          <div className="fade-up-element">
+          <div>
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
               <InputField
                 id="name"
@@ -185,7 +262,7 @@ export function Contact() {
           </div>
 
           {/* Right — info cards + map */}
-          <div className="fade-up-element space-y-5">
+          <div className="space-y-5">
             {/* Map card */}
             <div className="relative rounded-2xl overflow-hidden border border-border-light h-[220px]">
               <iframe

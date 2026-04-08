@@ -6,6 +6,7 @@
   --font-serif: var(--font-serif), Georgia, serif;
   --font-code: var(--font-mono), ui-monospace, monospace;
 
+  /* ── Base dark theme ── */
   --color-bg: #08080c;
   --color-bg-elevated: #0e0e14;
   --color-bg-card: #111118;
@@ -19,6 +20,50 @@
   --color-border: rgba(255, 255, 255, 0.05);
   --color-border-light: rgba(255, 255, 255, 0.09);
   --color-glow: rgba(196, 247, 81, 0.08);
+
+  /* ── Section color worlds ── */
+  /* About / Skills: warm cream/linen */
+  --section-light-bg: #f0ebe3;
+  --section-light-text: #0f0e0c;
+  --section-light-text-dim: #5a5046;
+  --section-light-text-muted: #9e9080;
+  --section-light-border: rgba(0, 0, 0, 0.08);
+  --section-light-accent: #0f0e0c;
+
+  /* Journey: dark charcoal + amber */
+  --section-journey-bg: #111110;
+  --section-journey-text: #f5f0e8;
+  --section-journey-accent: #f5c418;
+  --section-journey-accent-dim: rgba(245, 196, 24, 0.15);
+
+  /* Projects — individual palette per project */
+  --project-iot-bg: #001aff;
+  --project-iot-bg2: #0012cc;
+  --project-iot-text: #ffffff;
+  --project-iot-dim: rgba(255,255,255,0.6);
+
+  --project-ev-bg: #0b3d2e;
+  --project-ev-bg2: #071f17;
+  --project-ev-text: #a8f5d4;
+  --project-ev-dim: rgba(168,245,212,0.5);
+
+  --project-mobile-bg: #ff4f1a;
+  --project-mobile-bg2: #cc3b10;
+  --project-mobile-text: #fff5f0;
+  --project-mobile-dim: rgba(255,245,240,0.6);
+
+  --project-twin-bg: #1a0050;
+  --project-twin-bg2: #0d0030;
+  --project-twin-text: #d4b8ff;
+  --project-twin-dim: rgba(212,184,255,0.5);
+
+  --project-job-bg: #1a1a1a;
+  --project-job-text: #e0e0e0;
+  --project-job-dim: rgba(224,224,224,0.5);
+
+  --project-sonar-bg: #0d2233;
+  --project-sonar-text: #7dd4f8;
+  --project-sonar-dim: rgba(125,212,248,0.5);
 }
 
 ::selection {
@@ -41,6 +86,62 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
   overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
+   SECTION COLOR WORLD UTILITIES
+   ══════════════════════════════════════════ */
+
+/* Cream/linen world (About, Skills) */
+.section-light {
+  background-color: var(--section-light-bg);
+  color: var(--section-light-text);
+}
+.section-light .sec-label {
+  color: var(--section-light-text-muted);
+}
+.section-light .sec-dim {
+  color: var(--section-light-text-dim);
+}
+
+/* Journey world */
+.section-journey {
+  background-color: var(--section-journey-bg);
+  color: var(--section-journey-text);
+}
+
+/* ══════════════════════════════════════════
+   EDITORIAL TYPOGRAPHY UTILITIES
+   ══════════════════════════════════════════ */
+
+/* Outlined display text — stroke color inherits from parent section */
+.text-outline-dark {
+  -webkit-text-stroke: 2px var(--section-light-text);
+  -webkit-text-fill-color: transparent;
+}
+.text-outline-light {
+  -webkit-text-stroke: 2px rgba(255,255,255,0.9);
+  -webkit-text-fill-color: transparent;
+}
+.text-outline-amber {
+  -webkit-text-stroke: 2px var(--section-journey-accent);
+  -webkit-text-fill-color: transparent;
+}
+
+/* Section number — big editorial marker */
+.section-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -4px;
+}
+
+/* The slash separator used before section numbers */
+.section-slash {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
 }
 
 /* Noise texture */

@@ -21,11 +21,12 @@ const TECH_ICONS = [
   { label: "Postgres",   icon: "🐘", color: "#4169e1" },
 ];
 
+// More personality-driven stats — inspired by Milkshake's "173 pizza slices"
 const STATS = [
-  { value: 3,     suffix: "+",  label: "Years Building" },
-  { value: 6,     suffix: "",   label: "Production Systems" },
-  { value: 2,     suffix: "",   label: "App Stores Shipped" },
-  { value: 3,     suffix: "",   label: "Engineers Mentored" },
+  { value: 10000, suffix: "+", label: "Devices handled concurrently" },
+  { value: 6,     suffix: "",  label: "Production systems shipped" },
+  { value: 99,    suffix: "%", label: "Uptime on EV infrastructure" },
+  { value: 3,     suffix: "",  label: "Engineers levelled up" },
 ];
 
 function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {
@@ -36,7 +37,6 @@ function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-
     if (phase === "typing") {
       if (charIdx < words[wordIdx].length) {
         timeout = setTimeout(() => {
@@ -59,7 +59,6 @@ function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {
         setPhase("typing");
       }
     }
-
     return () => clearTimeout(timeout);
   }, [phase, charIdx, wordIdx, words, typingSpeed, pauseMs]);
 
@@ -68,23 +67,23 @@ function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {
 
 function AnimatedCounter({ target, suffix }: { target: number; suffix: string }) {
   const [count, setCount] = useState(0);
+  const [displayOverride, setDisplayOverride] = useState<string | null>(null);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
+  const scrambleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
-          const duration = 1400;
+          const duration = 1600;
           const steps = 60;
           const increment = target / steps;
           let current = 0;
           let step = 0;
-
           const timer = setInterval(() => {
             step++;
             current = Math.min(Math.round(increment * step), target);
@@ -95,31 +94,79 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
       },
       { threshold: 0.5 }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
   }, [target]);
 
-  const display = String(count);
+  function handleMouseEnter() {
+    if (scrambleTimer.current) clearInterval(scrambleTimer.current);
+    const CHARS = "0123456789";
+    const original = count.toLocaleString() + suffix;
+    let elapsed = 0;
+    const DURATION = 500;
+    const INTERVAL = 40;
+    scrambleTimer.current = setInterval(() => {
+      elapsed += INTERVAL;
+      if (elapsed >= DURATION) {
+        clearInterval(scrambleTimer.current!);
+        scrambleTimer.current = null;
+        setDisplayOverride(null);
+        return;
+      }
+      const scrambled = original.split("").map((ch) =>
+        /[0-9]/.test(ch) ? CHARS[Math.floor(Math.random() * CHARS.length)] : ch
+      ).join("");
+      setDisplayOverride(scrambled);
+    }, INTERVAL);
+  }
 
   return (
-    <span ref={ref}>
-      {display}
-      {suffix}
+    <span ref={ref} onMouseEnter={handleMouseEnter} style={{ cursor: "default" }}>
+      {displayOverride ?? (count.toLocaleString() + suffix)}
     </span>
   );
 }
 
-// Map each icon label to a letter for the sequence puzzle
+// ── Magnetic button wrapper ───────────────────────────────────────────────────
+function MagneticWrap({ children }: { children: React.ReactNode }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = wrapRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+    const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+    el.style.setProperty("--mx", `${dx * 9}px`);
+    el.style.setProperty("--my", `${dy * 5}px`);
+  }
+
+  function onMouseLeave() {
+    const el = wrapRef.current;
+    if (!el) return;
+    el.style.setProperty("--mx", "0px");
+    el.style.setProperty("--my", "0px");
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{
+        display: "inline-flex",
+        transform: "translate(var(--mx, 0px), var(--my, 0px))",
+        transition: "transform 0.18s cubic-bezier(0.23, 1, 0.32, 1)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 const ICON_LETTER: Record<string, string> = {
-  React: "R",
-  Node: "N",
-  Docker: "D",
-  Redis: "E",
-  TypeScript: "T",
-  K8s: "K",
-  MQTT: "M",
-  Postgres: "P",
+  React: "R", Node: "N", Docker: "D", Redis: "E",
+  TypeScript: "T", K8s: "K", MQTT: "M", Postgres: "P",
 };
 const CLUE3_SEQUENCE = ["R", "D", "T", "K"];
 
@@ -128,15 +175,80 @@ export function Hero() {
   const { unlockClue, canAttemptClue } = useHunt();
   const clickSeqRef = useRef<string[]>([]);
   const [lastPressed, setLastPressed] = useState<string | null>(null);
-  const [pressTick, setPressTick] = useState(0);
+
+  // Mouse parallax refs — direct DOM mutation, zero re-renders
+  const sectionRef = useRef<HTMLElement>(null);
+  const akashRef = useRef<HTMLSpanElement>(null);
+  const varmaRef = useRef<HTMLSpanElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    function onMouseMove(e: MouseEvent) {
+      const ox = (e.clientX / window.innerWidth - 0.5) * 2;  // -1 to 1
+      const oy = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (akashRef.current)
+        akashRef.current.style.transform = `translate(${-ox * 20}px, ${-oy * 10}px)`;
+      if (varmaRef.current)
+        varmaRef.current.style.transform = `translate(${ox * 12}px, ${oy * 6}px)`;
+      if (heroContentRef.current)
+        heroContentRef.current.style.transform =
+          `perspective(1200px) rotateX(${oy * -1.2}deg) rotateY(${ox * 1.2}deg)`;
+      if (spotlightRef.current && section) {
+        const rect = section.getBoundingClientRect();
+        spotlightRef.current.style.left = `${e.clientX - rect.left - 300}px`;
+        spotlightRef.current.style.top = `${e.clientY - rect.top - 300}px`;
+        spotlightRef.current.style.opacity = "1";
+      }
+    }
+
+    function onMouseLeave() {
+      if (akashRef.current) akashRef.current.style.transform = "";
+      if (varmaRef.current) varmaRef.current.style.transform = "";
+      if (heroContentRef.current) heroContentRef.current.style.transform = "";
+      if (spotlightRef.current) spotlightRef.current.style.opacity = "0";
+    }
+
+    section.addEventListener("mousemove", onMouseMove);
+    section.addEventListener("mouseleave", onMouseLeave);
+    return () => {
+      section.removeEventListener("mousemove", onMouseMove);
+      section.removeEventListener("mouseleave", onMouseLeave);
+    };
+  }, []);
 
   return (
-    <section id="hero-section" className="min-h-screen relative z-[1] flex flex-col justify-end pb-12 md:pb-16 px-6 md:px-12 overflow-hidden">
-      {/* Orbiting tech icons — decorative background layer */}
+    <section
+      ref={sectionRef}
+      id="hero-section"
+      className="min-h-screen relative z-[1] flex flex-col justify-end pb-12 md:pb-16 px-6 md:px-12 overflow-hidden"
+    >
+      {/* Mouse spotlight glow — DOM-direct, zero re-renders */}
+      <div
+        ref={spotlightRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          width: 600,
+          height: 600,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(196,247,81,0.07) 0%, transparent 70%)",
+          pointerEvents: "none",
+          opacity: 0,
+          transition: "opacity 0.4s ease",
+          zIndex: 1,
+          willChange: "left, top",
+        }}
+      />
+
+      {/* Orbiting tech icons */}
       <div
         aria-hidden
         className="absolute right-0 top-0 w-[640px] h-[640px] select-none"
-        style={{ opacity: 0.18, zIndex: 2 }}
+        style={{ opacity: 0.16, zIndex: 2 }}
       >
         {TECH_ICONS.map((tech, i) => {
           const angle = (i / TECH_ICONS.length) * 360;
@@ -145,39 +257,27 @@ export function Hero() {
           const duration = 26 + (i % 3) * 6;
           const letter = ICON_LETTER[tech.label];
           const isPressed = lastPressed === tech.label;
-
           return (
             <div
               key={tech.label}
               className="absolute"
               style={{
-                top: "50%",
-                left: "50%",
-                width: 64,
-                height: 64,
-                marginTop: -32,
-                marginLeft: -32,
+                top: "50%", left: "50%",
+                width: 64, height: 64,
+                marginTop: -32, marginLeft: -32,
                 animation: `hero-orbit-${i % 2 === 0 ? "cw" : "ccw"} ${duration}s linear ${delay}s infinite`,
                 transformOrigin: `${-radius}px 0px`,
                 transform: `rotate(${angle}deg) translateX(${radius}px)`,
-                cursor: "pointer",
-                pointerEvents: "auto",
-                touchAction: "manipulation",
+                cursor: "pointer", pointerEvents: "auto", touchAction: "manipulation",
               }}
               onClick={() => {
                 if (!letter) return;
                 setLastPressed(tech.label);
-                setPressTick((t) => t + 1);
                 const seq = clickSeqRef.current;
                 seq.push(letter);
-                // Keep only last 4
                 if (seq.length > 4) seq.splice(0, seq.length - 4);
                 const last4 = seq.slice(-4);
-                if (
-                  last4.length === 4 &&
-                  last4.every((l, idx) => l === CLUE3_SEQUENCE[idx]) &&
-                  canAttemptClue(4)
-                ) {
+                if (last4.length === 4 && last4.every((l, idx) => l === CLUE3_SEQUENCE[idx]) && canAttemptClue(4)) {
                   unlockClue(4);
                   clickSeqRef.current = [];
                 }
@@ -191,10 +291,8 @@ export function Hero() {
                   background: tech.color + "11",
                   fontSize: tech.icon.length > 1 ? "17px" : "28px",
                   lineHeight: 1,
-                  transform: isPressed ? "scale(1.06)" : "scale(1)",
-                  boxShadow: isPressed
-                    ? `0 0 22px ${tech.color}55, 0 0 8px ${tech.color}44 inset`
-                    : `0 0 12px ${tech.color}22`,
+                  transform: isPressed ? "scale(1.08)" : "scale(1)",
+                  boxShadow: isPressed ? `0 0 22px ${tech.color}55` : `0 0 12px ${tech.color}22`,
                   transition: "transform 160ms ease, box-shadow 200ms ease",
                 }}
               >
@@ -205,11 +303,48 @@ export function Hero() {
         })}
       </div>
 
-      <div className="w-full max-w-[1300px] mx-auto relative">
-        {/* Tag with role cycling */}
-        <div
-          className="font-code text-[0.6rem] tracking-[5px] uppercase text-accent mb-8 flex items-center gap-3 gsap-hero-line"
-        >
+      <div ref={heroContentRef} className="w-full max-w-[1300px] mx-auto relative z-[3]" style={{ willChange: "transform", transition: "transform 0.1s linear" }}>
+
+        {/* ── EDITORIAL NAME TREATMENT — filled + outlined stacked ── */}
+        <div className="mb-2 overflow-hidden gsap-hero-line">
+          <div
+            className="font-display font-black leading-[0.82] tracking-[-3px] select-none"
+            style={{ fontSize: "clamp(4.5rem, 13vw, 13rem)" }}
+          >
+            {/* Outlined AKASH — moves opposite at deeper parallax layer */}
+            <span
+              ref={akashRef}
+              className="block"
+              style={{
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.25)",
+                WebkitTextFillColor: "transparent",
+                letterSpacing: "-4px",
+                willChange: "transform",
+                transition: "transform 0.08s linear",
+                display: "block",
+              }}
+            >
+              AKASH
+            </span>
+            {/* Filled VARMA — moves at shallower depth, opposite direction */}
+            <span
+              ref={varmaRef}
+              className="block text-text"
+              style={{
+                letterSpacing: "-4px",
+                marginTop: "-0.05em",
+                willChange: "transform",
+                transition: "transform 0.08s linear",
+                display: "block",
+              }}
+            >
+              VARMA
+            </span>
+          </div>
+        </div>
+
+        {/* Role tag */}
+        <div className="font-code text-[0.6rem] tracking-[5px] uppercase text-accent mb-8 flex items-center gap-3 gsap-hero-line">
           <span className="w-6 h-px bg-accent" />
           <span>
             {role}
@@ -217,26 +352,22 @@ export function Hero() {
           </span>
         </div>
 
-        {/* Name + headline */}
-        <h1 className="font-display font-extrabold leading-[0.9] tracking-[-2px] mb-6">
-          <div className="text-[clamp(1rem,2.2vw,1.4rem)] font-normal tracking-[6px] uppercase text-text-dim font-code mb-3 gsap-hero-line">
-            akash varma
-          </div>
-          <div className="text-[clamp(2.8rem,7.5vw,6.8rem)] gsap-hero-line">
-            Building the
-          </div>
-          <div className="text-[clamp(2.8rem,7.5vw,6.8rem)] gsap-hero-line">
-            <span className="serif-italic font-normal tracking-[-1px]">infrastructure</span>
-          </div>
-          <div className="text-[clamp(2.8rem,7.5vw,6.8rem)] gsap-hero-line">
-            that powers the future
-            <span className="text-accent">.</span>
-          </div>
+        {/* Tagline headline — the actual hero copy */}
+        <h1 className="font-display font-extrabold leading-[0.92] tracking-[-2px] mb-10 gsap-hero-line" style={{ fontSize: "clamp(1.5rem, 3.6vw, 3.2rem)" }}>
+          Building the{" "}
+          <span
+            className="serif-italic font-normal"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            infrastructure
+          </span>
+          <br />
+          that powers the future
+          <span className="text-accent">.</span>
         </h1>
 
-        {/* Description + CTAs + Stats — all revealed together */}
+        {/* Description + CTAs */}
         <div className="gsap-hero-bottom">
-          {/* One-liner description */}
           <p className="max-w-lg text-[0.95rem] text-text-dim leading-[1.8] mb-10">
             I architect device-agnostic IoT ecosystems, design custom DSL engines,
             and build distributed systems handling{" "}
@@ -245,21 +376,24 @@ export function Hero() {
             <span className="text-text-muted">Based in Hyderabad, India.</span>
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-wrap items-center gap-4 mb-14">
-            <button
-              onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })}
-              className="group relative inline-flex items-center gap-2 px-7 py-3 bg-accent text-bg font-display font-bold text-[0.85rem] tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_28px_rgba(196,247,81,0.4)]"
-            >
-              View My Work
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-            </button>
-            <button
-              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-              className="inline-flex items-center gap-2 px-7 py-3 border border-border-light text-text font-display font-semibold text-[0.85rem] tracking-wide rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:shadow-[0_0_18px_rgba(196,247,81,0.12)]"
-            >
-              Get In Touch
-            </button>
+            <MagneticWrap>
+              <button
+                onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })}
+                className="group relative inline-flex items-center gap-2 px-7 py-3 bg-accent text-bg font-display font-bold text-[0.85rem] tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_28px_rgba(196,247,81,0.4)]"
+              >
+                View My Work
+                <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </button>
+            </MagneticWrap>
+            <MagneticWrap>
+              <button
+                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                className="inline-flex items-center gap-2 px-7 py-3 border border-border-light text-text font-display font-semibold text-[0.85rem] tracking-wide rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:shadow-[0_0_18px_rgba(196,247,81,0.12)]"
+              >
+                Get In Touch
+              </button>
+            </MagneticWrap>
             <a
               href="/resume.pdf"
               download="Akash_Varma_Resume.pdf"
@@ -274,24 +408,23 @@ export function Hero() {
             </a>
           </div>
 
-          {/* Stats row */}
+          {/* Stats row — personality-driven numbers like Milkshake */}
           <div className="flex flex-wrap gap-px border-t border-border-light pt-8">
             {STATS.map((stat) => (
               <div
                 key={stat.label}
-                className="flex-1 min-w-[120px] px-6 first:pl-0 last:pr-0 border-r border-border-light last:border-r-0"
+                className="flex-1 min-w-[140px] px-5 first:pl-0 last:pr-0 border-r border-border-light last:border-r-0"
               >
-                <div className="font-display font-extrabold text-[clamp(2rem,4vw,3rem)] text-accent leading-none mb-1">
+                <div className="font-display font-extrabold text-[clamp(1.6rem,3.2vw,2.4rem)] text-accent leading-none mb-1 tabular-nums">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="font-code text-[0.6rem] tracking-[3px] uppercase text-text-muted">
+                <div className="font-code text-[0.55rem] tracking-[2.5px] uppercase text-text-muted leading-snug">
                   {stat.label}
                 </div>
               </div>
             ))}
-
-            <div className="flex-1 min-w-[120px] px-6 last:pr-0 flex items-center justify-end gap-4">
-              <div className="w-10 h-[2px] bg-accent rounded-full animate-pulse-scale" />
+            <div className="flex-1 min-w-[100px] px-5 last:pr-0 flex items-center justify-end gap-3">
+              <div className="w-8 h-[2px] bg-accent rounded-full animate-pulse-scale" />
               <span className="font-code text-[0.55rem] tracking-[4px] uppercase text-text-muted">
                 Scroll
               </span>
@@ -300,7 +433,6 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Inline keyframes for orbiting icons + cursor blink */}
       <style>{`
         @keyframes icon-press-pulse {
           0% { transform: scale(1); }
@@ -319,9 +451,7 @@ export function Hero() {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0; }
         }
-        .animate-blink {
-          animation: blink 1s step-start infinite;
-        }
+        .animate-blink { animation: blink 1s step-start infinite; }
       `}</style>
     </section>
   );

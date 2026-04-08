@@ -15,7 +15,6 @@ import { Skills } from "@/components/Skills";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Preloader } from "@/components/Preloader";
-import { CustomCursor } from "@/components/CustomCursor";
 import { ArcadeCurtain } from "@/components/ArcadeCurtain";
 import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
@@ -29,7 +28,6 @@ export default function Home() {
   return (
     <HuntProvider>
       <SmoothScroll />
-      <CustomCursor />
       <Preloader onComplete={handlePreloaderComplete} />
 
       <div
@@ -49,16 +47,12 @@ export default function Home() {
         <Marquee />
 
         <About />
-        <div className="divider-glow mx-6 md:mx-12" />
 
         <Projects />
-        <div className="divider-glow mx-6 md:mx-12" />
 
         <Journey />
-        <div className="divider-glow mx-6 md:mx-12" />
 
         <Skills />
-        <div className="divider-glow mx-6 md:mx-12" />
 
         <Contact />
         <Footer />

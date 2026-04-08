@@ -1,480 +1,747 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { FadeUp } from "./RevealText";
-import { TiltCard } from "./TiltCard";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Project definitions — each with its own color world
+// ─────────────────────────────────────────────────────────────────────────────
 const projects = [
   {
     num: "01",
-    title: "Device-Agnostic IoT Platform",
-    desc: "A platform that onboards any device, any protocol — without new code. Powered by FUS Script, a custom DSL I designed for runtime protocol definitions and data transformations. Distributed Redis-based messaging handles thousands of concurrent connections.",
+    title: "Device-Agnostic",
+    titleLine2: "IoT Platform",
+    type: "DSL + BACKEND + INFRA",
+    desc: "A platform that onboards any device, any protocol — without new code. Powered by FUS Script, a custom DSL I designed for runtime protocol definitions and data transformations.",
     tags: ["TypeScript", "DSL", "Redis", "MQTT", "WebSockets"],
     metrics: [
       { value: "40%", label: "Faster Integration" },
       { value: "10K+", label: "Concurrent Devices" },
       { value: "₹40L+", label: "Project Value" },
     ],
-    accent: "#c4f751",
-    featured: true,
-    github: "", // add GitHub URL if public
-    demo: "",   // add live demo URL if available
+    bg: "#0018cc",
+    bg2: "#000ea0",
+    textColor: "#ffffff",
+    dimColor: "rgba(255,255,255,0.55)",
+    tagBg: "rgba(255,255,255,0.1)",
+    tagBorder: "rgba(255,255,255,0.2)",
+    tagText: "#ffffff",
+    visual: "iot",
   },
   {
     num: "02",
-    title: "EV Charging Infrastructure",
-    desc: "End-to-end platform with OCPP 1.6J. Real-time monitoring, analytics dashboards, sub-second telemetry, ~99% uptime.",
-    tags: ["Node.js", "OCPP 1.6", "React"],
-    accent: "#818cf8",
-    featured: false,
-    github: "",
-    demo: "",
+    title: "EV Charging",
+    titleLine2: "Infrastructure",
+    type: "REAL-TIME + PLATFORM",
+    desc: "End-to-end platform with OCPP 1.6J. Real-time monitoring, analytics dashboards, sub-second telemetry, ~99% uptime across distributed charging stations.",
+    tags: ["Node.js", "OCPP 1.6", "React", "WebSockets"],
+    metrics: [
+      { value: "99%", label: "Uptime" },
+      { value: "<1s", label: "Telemetry latency" },
+      { value: "Full", label: "OCPP 1.6J compliant" },
+    ],
+    bg: "#0b3d2e",
+    bg2: "#071f17",
+    textColor: "#a8f5d4",
+    dimColor: "rgba(168,245,212,0.5)",
+    tagBg: "rgba(168,245,212,0.08)",
+    tagBorder: "rgba(168,245,212,0.2)",
+    tagText: "#a8f5d4",
+    visual: "ev",
   },
   {
     num: "03",
     title: "IoT Mobile App",
-    desc: "Cross-platform app for device onboarding, analytics, team management, and automation. Shipped to Play Store & App Store.",
-    tags: ["React Native", "IoT", "Cross-Platform"],
-    accent: "#fb923c",
-    featured: false,
-    github: "",
-    demo: "",
+    titleLine2: "— Both Stores",
+    type: "MOBILE + CROSS-PLATFORM",
+    desc: "Cross-platform app for device onboarding, analytics, team management, and automation. Shipped to Play Store & App Store. Built with React Native.",
+    tags: ["React Native", "IoT", "TypeScript"],
+    metrics: [
+      { value: "2", label: "App stores shipped" },
+      { value: "Live", label: "Play Store & App Store" },
+    ],
+    bg: "#d63c00",
+    bg2: "#a82d00",
+    textColor: "#fff5f0",
+    dimColor: "rgba(255,245,240,0.6)",
+    tagBg: "rgba(255,245,240,0.1)",
+    tagBorder: "rgba(255,245,240,0.25)",
+    tagText: "#fff5f0",
+    visual: "mobile",
   },
   {
     num: "04",
-    title: "Digital Twin Engine",
-    desc: "Plug-and-play simulation engine for 10K+ virtual IoT devices across industries.",
-    tags: ["Simulation", "Event-Driven"],
-    accent: "#c4f751",
-    featured: false,
-    github: "",
-    demo: "",
+    title: "Digital Twin",
+    titleLine2: "Engine",
+    type: "SIMULATION + EVENT-DRIVEN",
+    desc: "Plug-and-play simulation engine for 10K+ virtual IoT devices across industries. Stress-tests infrastructure before physical deployment.",
+    tags: ["TypeScript", "Simulation", "Event-Driven"],
+    metrics: [
+      { value: "10K+", label: "Virtual devices" },
+      { value: "Any", label: "Industry vertical" },
+    ],
+    bg: "#1e0058",
+    bg2: "#0d0030",
+    textColor: "#d4b8ff",
+    dimColor: "rgba(212,184,255,0.5)",
+    tagBg: "rgba(212,184,255,0.08)",
+    tagBorder: "rgba(212,184,255,0.2)",
+    tagText: "#d4b8ff",
+    visual: "twin",
   },
   {
     num: "05",
-    title: "Autonomous Job Manager",
-    desc: "AI-driven orchestration in isolated Docker containers with automated error recovery.",
-    tags: ["AI", "Docker", "Async"],
-    accent: "#818cf8",
-    featured: false,
-    github: "",
-    demo: "",
+    title: "Autonomous Job",
+    titleLine2: "Manager",
+    type: "AI + ORCHESTRATION",
+    desc: "AI-driven job orchestration in isolated Docker containers with automated error recovery, retry logic, and real-time status monitoring.",
+    tags: ["AI", "Docker", "Node.js", "Async"],
+    metrics: [
+      { value: "Auto", label: "Error recovery" },
+      { value: "Isolated", label: "Container execution" },
+    ],
+    bg: "#161616",
+    bg2: "#0a0a0a",
+    textColor: "#e0e0e0",
+    dimColor: "rgba(224,224,224,0.45)",
+    tagBg: "rgba(255,255,255,0.05)",
+    tagBorder: "rgba(255,255,255,0.12)",
+    tagText: "#e0e0e0",
+    visual: "jobs",
   },
   {
     num: "06",
-    title: "Sonar Analysis Platform",
-    desc: "Audio-based sonar data → heatmaps and charts. Python processing, Next.js visualization.",
-    tags: ["Python", "Next.js"],
-    accent: "#fb923c",
-    featured: false,
-    github: "",
-    demo: "",
+    title: "Sonar Analysis",
+    titleLine2: "Platform",
+    type: "DATA + VISUALISATION",
+    desc: "Audio-based sonar data processing → interactive heatmaps and charts. Python processing pipeline, Next.js visualization layer.",
+    tags: ["Python", "Next.js", "Data Viz"],
+    metrics: [
+      { value: "Audio", label: "Sonar data input" },
+      { value: "Live", label: "Heatmap output" },
+    ],
+    bg: "#0d2233",
+    bg2: "#071525",
+    textColor: "#7dd4f8",
+    dimColor: "rgba(125,212,248,0.45)",
+    tagBg: "rgba(125,212,248,0.07)",
+    tagBorder: "rgba(125,212,248,0.18)",
+    tagText: "#7dd4f8",
+    visual: "sonar",
   },
 ];
 
-// Tag dot colors cycle
-const tagDotColors = ["#c4f751", "#818cf8", "#fb923c", "#38bdf8", "#f472b6"];
-
-// Animated metric counter
-function MetricCounter({ value, label }: { value: string; label: string }) {
-  const [displayed, setDisplayed] = useState("0");
-  const ref = useRef<HTMLDivElement>(null);
-  const animatedRef = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !animatedRef.current) {
-          animatedRef.current = true;
-          // Extract numeric part and suffix
-          const match = value.match(/^([₹]?)(\d+(?:\.\d+)?)([KL%+]*)?$/);
-          if (!match) {
-            setDisplayed(value);
-            return;
-          }
-          const prefix = match[1] || "";
-          const num = parseFloat(match[2]);
-          const suffix = match[3] || "";
-          const duration = 1200;
-          const start = performance.now();
-
-          function tick(now: number) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = Math.floor(eased * num);
-            setDisplayed(`${prefix}${current}${suffix}`);
-            if (progress < 1) requestAnimationFrame(tick);
-            else setDisplayed(value);
-          }
-
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [value]);
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Custom SVG architecture diagrams per project — visual evidence
+// ─────────────────────────────────────────────────────────────────────────────
+function IoTDiagram({ textColor }: { textColor: string; dimColor?: string }) {
   return (
-    <div ref={ref} className="flex flex-col gap-1">
-      <span
-        className="font-display font-black text-3xl md:text-4xl tracking-tight"
-        style={{ color: "#c4f751" }}
-      >
-        {displayed}
-      </span>
-      <span className="font-code text-[0.5rem] uppercase tracking-[3px] text-[#56526a]">
-        {label}
-      </span>
-    </div>
+    <svg viewBox="0 0 480 260" fill="none" className="w-full h-full" aria-hidden="true">
+      <style>{`
+        @keyframes flow-right { to { stroke-dashoffset: -32; } }
+        @keyframes flow-left  { to { stroke-dashoffset: 32; } }
+        @keyframes node-pulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+        .flow-r { animation: flow-right 1.6s linear infinite; stroke-dasharray: 8 6; }
+        .flow-l { animation: flow-left 1.6s linear infinite; stroke-dasharray: 8 6; }
+        .pulse  { animation: node-pulse 2.5s ease-in-out infinite; }
+      `}</style>
+
+      {/* DSL Engine — centre hero box */}
+      <rect x="170" y="90" width="140" height="60" rx="8" fill={textColor} fillOpacity=".06" stroke={textColor} strokeOpacity=".4" strokeWidth="1.5"/>
+      <text x="240" y="116" textAnchor="middle" fontFamily="monospace" fontSize="9" fill={textColor} opacity=".9" fontWeight="700">FUS SCRIPT</text>
+      <text x="240" y="130" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".5">DSL Engine</text>
+
+      {/* Devices left */}
+      {[30, 80, 130].map((y, i) => (
+        <g key={i} className="pulse" style={{ animationDelay: `${i * 0.4}s` }}>
+          <rect x="14" y={y} width="68" height="28" rx="5" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".25" strokeWidth="1"/>
+          <text x="48" y={y + 18} textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".7">
+            {["MQTT", "WebSocket", "HTTP"][i]}
+          </text>
+        </g>
+      ))}
+      {/* Connectors: devices → DSL */}
+      {[44, 94, 144].map((y, i) => (
+        <line key={i} className="flow-r" x1="84" y1={y} x2="170" y2={120} stroke={textColor} strokeOpacity=".3" strokeWidth="1"/>
+      ))}
+
+      {/* Redis right */}
+      <rect x="366" y="55" width="100" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".25" strokeWidth="1"/>
+      <text x="416" y="75" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7" fontWeight="600">REDIS PUB/SUB</text>
+
+      {/* Connectors: DSL → Redis / Dashboard */}
+      <line className="flow-r" x1="310" y1="110" x2="366" y2="72" stroke={textColor} strokeOpacity=".35" strokeWidth="1"/>
+
+      {/* Dashboard */}
+      <rect x="366" y="115" width="100" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".25" strokeWidth="1"/>
+      <text x="416" y="135" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7" fontWeight="600">DASHBOARD</text>
+      <line className="flow-r" x1="310" y1="125" x2="366" y2="131" stroke={textColor} strokeOpacity=".35" strokeWidth="1"/>
+
+      {/* DB */}
+      <rect x="366" y="175" width="100" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".25" strokeWidth="1"/>
+      <text x="416" y="195" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7" fontWeight="600">POSTGRESQL</text>
+      <line className="flow-r" x1="310" y1="140" x2="366" y2="191" stroke={textColor} strokeOpacity=".35" strokeWidth="1"/>
+
+      {/* Label */}
+      <text x="14" y="210" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".3">Any device. Any protocol.</text>
+    </svg>
   );
 }
 
-// Animated circuit SVG decoration for featured card
-function CircuitDecoration() {
+function EVDiagram({ textColor }: { textColor: string }) {
   return (
-    <svg
-      className="absolute right-0 top-0 opacity-[0.07] pointer-events-none select-none"
-      width="420"
-      height="420"
-      viewBox="0 0 420 420"
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 480 240" fill="none" className="w-full h-full" aria-hidden="true">
       <style>{`
-        @keyframes dash-flow {
-          to { stroke-dashoffset: -200; }
-        }
-        .circuit-line { animation: dash-flow 4s linear infinite; stroke-dasharray: 8 6; }
-        .circuit-line-slow { animation: dash-flow 7s linear infinite; stroke-dasharray: 12 8; }
+        @keyframes charge-pulse { 0%,100%{opacity:.5;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.06)} }
+        .charger { animation: charge-pulse 2s ease-in-out infinite; transform-origin: center; }
       `}</style>
-      {/* Horizontal rails */}
-      <line className="circuit-line" x1="0" y1="80" x2="420" y2="80" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="0" y1="200" x2="420" y2="200" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="0" y1="320" x2="420" y2="320" stroke="#c4f751" strokeWidth="1" />
-      {/* Vertical rails */}
-      <line className="circuit-line-slow" x1="100" y1="0" x2="100" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="240" y1="0" x2="240" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="360" y1="0" x2="360" y2="420" stroke="#c4f751" strokeWidth="1" />
-      {/* Nodes */}
-      {[
-        [100, 80], [240, 80], [360, 80],
-        [100, 200], [240, 200], [360, 200],
-        [100, 320], [240, 320], [360, 320],
-      ].map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="4" fill="#c4f751" />
+
+      {/* Central platform */}
+      <rect x="155" y="80" width="170" height="70" rx="10" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".35" strokeWidth="1.5"/>
+      <text x="240" y="111" textAnchor="middle" fontFamily="monospace" fontSize="9" fill={textColor} opacity=".9" fontWeight="700">OCPP 1.6J</text>
+      <text x="240" y="126" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".5">Platform Core</text>
+      <text x="240" y="140" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".35">99% uptime</text>
+
+      {/* Chargers left */}
+      {[40, 100, 160].map((y, i) => (
+        <g key={i} className="charger" style={{ animationDelay: `${i * 0.6}s` }}>
+          <rect x="10" y={y} width="70" height="36" rx="6" fill={textColor} fillOpacity=".04" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+          <text x="45" y={y + 14} textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".6">Charger</text>
+          <text x="45" y={y + 26} textAnchor="middle" fontFamily="monospace" fontSize="6.5" fill={textColor} opacity=".4">{`Station ${i + 1}`}</text>
+          <line x1="82" y1={y + 18} x2="155" y2="115" stroke={textColor} strokeOpacity=".22" strokeWidth="1" strokeDasharray="5 4"/>
+        </g>
       ))}
-      {/* Small decorative squares at some nodes */}
+
+      {/* Right outputs */}
       {[
-        [100, 80], [240, 200], [360, 320],
-      ].map(([cx, cy], i) => (
-        <rect key={i} x={cx - 8} y={cy - 8} width="16" height="16" rx="2" stroke="#c4f751" strokeWidth="1" fill="none" />
+        { label: "Real-time Monitor", y: 55 },
+        { label: "Analytics", y: 100 },
+        { label: "Sub-second Telemetry", y: 145 },
+        { label: "Alerts & Billing", y: 190 },
+      ].map(({ label, y }) => (
+        <g key={label}>
+          <rect x="380" y={y} width="92" height="28" rx="5" fill={textColor} fillOpacity=".04" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+          <text x="426" y={y + 18} textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".6">{label}</text>
+          <line x1="325" y1="115" x2="380" y2={y + 14} stroke={textColor} strokeOpacity=".2" strokeWidth="1" strokeDasharray="5 4"/>
+        </g>
       ))}
     </svg>
   );
 }
 
-// Non-featured project card
-function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
-  const [hovered, setHovered] = useState(false);
+function MobileDiagram({ textColor }: { textColor: string }) {
+  return (
+    <svg viewBox="0 0 480 260" fill="none" className="w-full h-full" aria-hidden="true">
+      {/* Phone outline */}
+      <rect x="170" y="20" width="140" height="220" rx="18" fill={textColor} fillOpacity=".04" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5"/>
+      <rect x="200" y="34" width="80" height="12" rx="6" fill={textColor} fillOpacity=".08"/>
+      {/* Screens inside */}
+      <rect x="180" y="56" width="120" height="64" rx="6" fill={textColor} fillOpacity=".06" stroke={textColor} strokeOpacity=".15" strokeWidth="1"/>
+      <text x="240" y="82" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7" fontWeight="600">Device Onboarding</text>
+      <text x="240" y="96" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".4">QR scan → connect</text>
+      <rect x="180" y="130" width="56" height="48" rx="5" fill={textColor} fillOpacity=".06" stroke={textColor} strokeOpacity=".12" strokeWidth="1"/>
+      <text x="208" y="152" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".6">Analytics</text>
+      <rect x="244" y="130" width="56" height="48" rx="5" fill={textColor} fillOpacity=".06" stroke={textColor} strokeOpacity=".12" strokeWidth="1"/>
+      <text x="272" y="152" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".6">Alerts</text>
+      {/* Stores */}
+      <rect x="20" y="90" width="110" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+      <text x="75" y="110" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7">▲ Play Store</text>
+      <rect x="20" y="140" width="110" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+      <text x="75" y="160" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7"> App Store</text>
+      <line x1="130" y1="106" x2="170" y2="106" stroke={textColor} strokeOpacity=".2" strokeWidth="1" strokeDasharray="4 3"/>
+      <line x1="130" y1="156" x2="170" y2="156" stroke={textColor} strokeOpacity=".2" strokeWidth="1" strokeDasharray="4 3"/>
+      {/* React Native badge */}
+      <rect x="350" y="100" width="108" height="32" rx="6" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+      <text x="404" y="120" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".7">React Native</text>
+      <line x1="310" y1="116" x2="350" y2="116" stroke={textColor} strokeOpacity=".2" strokeWidth="1" strokeDasharray="4 3"/>
+    </svg>
+  );
+}
+
+function TwinDiagram({ textColor }: { textColor: string }) {
+  return (
+    <svg viewBox="0 0 480 240" fill="none" className="w-full h-full" aria-hidden="true">
+      <style>{`
+        @keyframes twin-blink { 0%,100%{opacity:.4} 50%{opacity:.9} }
+        .twin-dot { animation: twin-blink 1.8s ease-in-out infinite; }
+      `}</style>
+      {/* Grid of virtual devices */}
+      {Array.from({ length: 25 }).map((_, i) => {
+        const col = i % 5;
+        const row = Math.floor(i / 5);
+        const x = 20 + col * 54;
+        const y = 20 + row * 44;
+        return (
+          <g key={i} className="twin-dot" style={{ animationDelay: `${(i * 0.12) % 2}s` }}>
+            <rect x={x} y={y} width="42" height="30" rx="4" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".18" strokeWidth="1"/>
+            <text x={x + 21} y={y + 19} textAnchor="middle" fontFamily="monospace" fontSize="6.5" fill={textColor} opacity=".55">
+              {`DEV-${String(i + 1).padStart(2, "0")}`}
+            </text>
+          </g>
+        );
+      })}
+      {/* Arrow to engine */}
+      <line x1="296" y1="110" x2="370" y2="110" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5" strokeDasharray="6 4"/>
+      {/* Sim engine */}
+      <rect x="370" y="82" width="100" height="56" rx="8" fill={textColor} fillOpacity=".06" stroke={textColor} strokeOpacity=".4" strokeWidth="1.5"/>
+      <text x="420" y="107" textAnchor="middle" fontFamily="monospace" fontSize="8.5" fill={textColor} opacity=".9" fontWeight="700">SIM ENGINE</text>
+      <text x="420" y="122" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".4">10K+ devices</text>
+      {/* Label */}
+      <text x="20" y="230" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".3">Stress-test before physical deployment.</text>
+    </svg>
+  );
+}
+
+function JobsDiagram({ textColor }: { textColor: string }) {
+  return (
+    <svg viewBox="0 0 480 220" fill="none" className="w-full h-full" aria-hidden="true">
+      <style>{`
+        @keyframes job-spin { to { stroke-dashoffset: -40; } }
+        .job-flow { animation: job-spin 2s linear infinite; stroke-dasharray: 10 6; }
+      `}</style>
+      {/* Orchestrator */}
+      <rect x="170" y="80" width="140" height="56" rx="8" fill={textColor} fillOpacity=".07" stroke={textColor} strokeOpacity=".4" strokeWidth="1.5"/>
+      <text x="240" y="106" textAnchor="middle" fontFamily="monospace" fontSize="9" fill={textColor} opacity=".9" fontWeight="700">AI Orchestrator</text>
+      <text x="240" y="122" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".45">Job scheduler</text>
+      {/* Containers */}
+      {[30, 100, 170].map((y, i) => (
+        <g key={i}>
+          <rect x="370" y={y} width="96" height="32" rx="6" fill={textColor} fillOpacity=".04" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+          <text x="418" y={y + 14} textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".6" fontWeight="600">Container</text>
+          <text x="418" y={y + 25} textAnchor="middle" fontFamily="monospace" fontSize="6.5" fill={textColor} opacity=".38">{`Job ${i + 1}`}</text>
+          <line className="job-flow" x1="310" y1="108" x2="370" y2={y + 16} stroke={textColor} strokeOpacity=".3" strokeWidth="1"/>
+        </g>
+      ))}
+      {/* Input */}
+      <rect x="14" y="86" width="110" height="42" rx="6" fill={textColor} fillOpacity=".04" stroke={textColor} strokeOpacity=".2" strokeWidth="1"/>
+      <text x="69" y="106" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".6" fontWeight="600">Job Queue</text>
+      <text x="69" y="120" textAnchor="middle" fontFamily="monospace" fontSize="6.5" fill={textColor} opacity=".38">+ Error recovery</text>
+      <line className="job-flow" x1="124" y1="108" x2="170" y2="108" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5"/>
+    </svg>
+  );
+}
+
+function SonarDiagram({ textColor }: { textColor: string }) {
+  return (
+    <svg viewBox="0 0 480 220" fill="none" className="w-full h-full" aria-hidden="true">
+      {/* Sonar rings */}
+      {[60, 100, 140].map((r, i) => (
+        <circle key={i} cx="120" cy="110" r={r} stroke={textColor} strokeOpacity={0.15 - i * 0.04} strokeWidth="1" strokeDasharray="6 4"/>
+      ))}
+      <circle cx="120" cy="110" r="18" fill={textColor} fillOpacity=".08" stroke={textColor} strokeOpacity=".4" strokeWidth="1.5"/>
+      <text x="120" y="114" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".7">SONAR</text>
+      {/* Processing pipeline */}
+      <line x1="260" y1="110" x2="220" y2="110" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5" strokeDasharray="6 4"/>
+      <rect x="260" y="80" width="100" height="60" rx="8" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5"/>
+      <text x="310" y="107" textAnchor="middle" fontFamily="monospace" fontSize="8" fill={textColor} opacity=".8" fontWeight="700">Python</text>
+      <text x="310" y="121" textAnchor="middle" fontFamily="monospace" fontSize="7" fill={textColor} opacity=".45">Processing</text>
+      {/* Output */}
+      <line x1="360" y1="110" x2="400" y2="110" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5" strokeDasharray="6 4"/>
+      <rect x="400" y="80" width="72" height="60" rx="8" fill={textColor} fillOpacity=".05" stroke={textColor} strokeOpacity=".3" strokeWidth="1.5"/>
+      <text x="436" y="107" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".8" fontWeight="700">Heat</text>
+      <text x="436" y="119" textAnchor="middle" fontFamily="monospace" fontSize="7.5" fill={textColor} opacity=".8" fontWeight="700">maps</text>
+    </svg>
+  );
+}
+
+function ProjectVisual({ type, textColor, dimColor }: { type: string; textColor: string; dimColor: string }) {
+  const style = { width: "100%", height: "100%", maxHeight: "220px" };
+  switch (type) {
+    case "iot":    return <div style={style}><IoTDiagram textColor={textColor} dimColor={dimColor} /></div>;
+    case "ev":     return <div style={style}><EVDiagram textColor={textColor} /></div>;
+    case "mobile": return <div style={style}><MobileDiagram textColor={textColor} /></div>;
+    case "twin":   return <div style={style}><TwinDiagram textColor={textColor} /></div>;
+    case "jobs":   return <div style={style}><JobsDiagram textColor={textColor} /></div>;
+    case "sonar":  return <div style={style}><SonarDiagram textColor={textColor} /></div>;
+    default:       return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Animated metric counter
+// ─────────────────────────────────────────────────────────────────────────────
+function MetricVal({ value, color }: { value: string; color: string }) {
+  const [displayed, setDisplayed] = useState("–");
+  const ref = useRef<HTMLDivElement>(null);
+  const done = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !done.current) {
+        done.current = true;
+        const match = value.match(/^([₹<]?)(\d+(?:\.\d+)?)([KL%+s]*)$/);
+        if (!match) { setDisplayed(value); return; }
+        const [, pre, num, suf] = match;
+        const n = parseFloat(num);
+        const dur = 1000;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / dur, 1);
+          const eased = 1 - (1 - p) ** 3;
+          setDisplayed(`${pre}${Math.floor(eased * n)}${suf}`);
+          if (p < 1) requestAnimationFrame(tick);
+          else setDisplayed(value);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [value]);
 
   return (
-    <div
-      className="gsap-project-card h-full cursor-default"
-      data-cursor="VIEW"
-      style={{
-        borderRadius: "1rem",
-        border: `1px solid ${hovered ? `${project.accent}30` : "rgba(255,255,255,0.05)"}`,
-        boxShadow: hovered
-          ? `0 0 40px ${project.accent}18, 0 8px 40px rgba(0,0,0,0.4)`
-          : "0 2px 20px rgba(0,0,0,0.3)",
-        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-    <TiltCard
-      className={`h-full bg-[#111118] rounded-2xl relative overflow-hidden flex flex-col justify-between group`}
-    >
-      {/* Accent top border animated on hover */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "2px",
-          background: `linear-gradient(90deg, transparent, ${project.accent}, transparent)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.4s ease",
-        }}
-      />
-
-      {/* Subtle hover gradient wash */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `radial-gradient(ellipse at 30% 20%, ${project.accent}08 0%, transparent 65%)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.5s ease",
-          pointerEvents: "none",
-        }}
-      />
-
-      <div className="relative z-[1] p-6 md:p-7 flex flex-col h-full">
-        {/* Number + accent dot row */}
-        <div className="flex items-start justify-between mb-5">
-          <span
-            className="font-display font-black text-[3.5rem] leading-none tracking-[-4px] select-none"
-            style={{
-              color: project.accent,
-              opacity: hovered ? 0.18 : 0.07,
-              transition: "opacity 0.4s ease",
-            }}
-          >
-            {project.num}
-          </span>
-          <span
-            className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-            style={{ background: project.accent, opacity: 0.6 }}
-          />
-        </div>
-
-        {/* Title */}
-        <h3
-          className="font-display text-base md:text-lg font-bold tracking-[-0.3px] mb-3 leading-snug"
-          style={{ color: "#f5f5f7" }}
-        >
-          {project.title}
-        </h3>
-
-        {/* Description — expands slightly on hover */}
-        <p
-          className="text-[0.8rem] leading-[1.75] flex-1"
-          style={{
-            color: "#9b97a8",
-            transition: "color 0.3s ease",
-          }}
-        >
-          {project.desc}
-        </p>
-
-        {/* Tags + links row */}
-        <div className="flex items-end justify-between gap-2 mt-5 pt-4 border-t border-[rgba(255,255,255,0.05)]">
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag, ti) => (
-              <span key={tag} className="flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: tagDotColors[ti % tagDotColors.length] }}
-                />
-                <span
-                  className="font-code text-[0.55rem] uppercase tracking-[1.5px]"
-                  style={{ color: "#56526a" }}
-                >
-                  {tag}
-                </span>
-              </span>
-            ))}
-          </div>
-          {/* External links */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {project.github ? (
-              <a href={project.github} target="_blank" rel="noopener noreferrer"
-                className="text-[#56526a] hover:text-text transition-colors duration-200"
-                onClick={(e) => e.stopPropagation()} title="GitHub">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </a>
-            ) : (
-              <span className="font-code text-[0.48rem] tracking-[1px] text-[#3a3847]">private</span>
-            )}
-            {project.demo && (
-              <a href={project.demo} target="_blank" rel="noopener noreferrer"
-                className="text-[#56526a] hover:text-text transition-colors duration-200"
-                onClick={(e) => e.stopPropagation()} title="Live demo">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-    </TiltCard>
+    <div ref={ref} style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", lineHeight: 1, color, letterSpacing: "-1px" }}>
+      {displayed}
     </div>
   );
 }
 
-export function Projects() {
-  const featured = projects[0];
-  const rest = projects.slice(1);
+// ─────────────────────────────────────────────────────────────────────────────
+// Single project section — full bleed color world
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Per-project tag pill with spring hover ────────────────────────────────────
+function ProjectTag({
+  tag,
+  tagBg, tagBorder, tagText, textColor,
+}: {
+  tag: string;
+  tagBg: string; tagBorder: string; tagText: string; textColor: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <span
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        fontFamily: "var(--font-code)",
+        fontSize: "0.55rem",
+        letterSpacing: "1.5px",
+        textTransform: "uppercase",
+        padding: "5px 12px",
+        borderRadius: "100px",
+        background: hovered ? `${textColor}18` : tagBg,
+        border: `1px solid ${hovered ? `${textColor}40` : tagBorder}`,
+        color: hovered ? textColor : tagText,
+        transform: hovered ? "scale(1.06) translateY(-1px)" : "scale(1) translateY(0)",
+        transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        display: "inline-block",
+        cursor: "default",
+      }}
+    >
+      {tag}
+    </span>
+  );
+}
+
+function ProjectSection({ project, index }: { project: typeof projects[number]; index: number }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setVisible(true); io.disconnect(); }
+    }, { threshold: 0.08 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Visual panel tilt on hover — direct DOM mutation, zero re-renders
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    function onMove(e: MouseEvent) {
+      const r = panel!.getBoundingClientRect();
+      const ox = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      const oy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      panel!.style.transform = `perspective(800px) rotateX(${oy * -4}deg) rotateY(${ox * 4}deg) scale(1.02)`;
+    }
+    function onLeave() {
+      panel!.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)";
+    }
+    panel.addEventListener("mousemove", onMove);
+    panel.addEventListener("mouseleave", onLeave);
+    return () => {
+      panel.removeEventListener("mousemove", onMove);
+      panel.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  const { bg, bg2, textColor, dimColor, tagBg, tagBorder, tagText } = project;
 
   return (
-    <section id="work" className="py-24 md:py-36 relative z-[1]">
-      <div className="max-w-[1300px] mx-auto px-6 md:px-12">
+    <div
+      ref={ref}
+      style={{
+        background: `linear-gradient(135deg, ${bg} 0%, ${bg2} 100%)`,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(40px)",
+        transition: "opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+        transitionDelay: `${index * 0.05}s`,
+      }}
+    >
+      <div
+        className="max-w-[1300px] mx-auto"
+        style={{ padding: "clamp(56px, 8vw, 100px) clamp(24px, 5vw, 64px)" }}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 lg:gap-16 items-center">
 
-        {/* Section label */}
-        <FadeUp>
-          <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-[#56526a] block mb-4">
-            02 / Work
-          </span>
-        </FadeUp>
-        <FadeUp delay={0.08}>
-          <h2 className="font-display text-[clamp(1.6rem,4vw,3.2rem)] font-extrabold tracking-[-2px] leading-[1.1] mb-14">
+          {/* Left: text content */}
+          <div>
+            {/* Number + type tag row — Milkshake style */}
+            <div className="flex items-center gap-4 mb-6">
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 900,
+                  fontSize: "clamp(3rem, 8vw, 6rem)",
+                  lineHeight: 0.85,
+                  color: textColor,
+                  opacity: 0.12,
+                  letterSpacing: "-3px",
+                }}
+              >
+                {project.num}
+              </span>
+              <div
+                style={{
+                  height: "1px",
+                  flex: 1,
+                  background: `linear-gradient(90deg, ${textColor}40, transparent)`,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "var(--font-code)",
+                  fontSize: "0.5rem",
+                  letterSpacing: "3px",
+                  textTransform: "uppercase",
+                  color: textColor,
+                  opacity: 0.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {project.type}
+              </span>
+            </div>
+
+            {/* Title — filled line 1, outlined line 2 (Milkshake dual-layer technique) */}
+            <div className="mb-6">
+              <h3
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 900,
+                  fontSize: "clamp(2rem, 5vw, 4.2rem)",
+                  lineHeight: 0.9,
+                  letterSpacing: "-2px",
+                  color: textColor,
+                  display: "block",
+                }}
+              >
+                {project.title}
+              </h3>
+              <h3
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 900,
+                  fontSize: "clamp(2rem, 5vw, 4.2rem)",
+                  lineHeight: 0.9,
+                  letterSpacing: "-2px",
+                  color: "transparent",
+                  WebkitTextStroke: `1.5px ${textColor}`,
+                  WebkitTextFillColor: "transparent",
+                  display: "block",
+                  marginTop: "0.04em",
+                }}
+              >
+                {project.titleLine2}
+              </h3>
+            </div>
+
+            {/* Description */}
+            <p
+              style={{
+                fontSize: "0.95rem",
+                lineHeight: 1.8,
+                color: dimColor,
+                marginBottom: "24px",
+                maxWidth: "500px",
+              }}
+            >
+              {project.desc}
+            </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              {project.tags.map((tag) => (
+                <ProjectTag
+                  key={tag}
+                  tag={tag}
+                  tagBg={tagBg}
+                  tagBorder={tagBorder}
+                  tagText={tagText}
+                  textColor={textColor}
+                />
+              ))}
+              <span
+                style={{
+                  fontFamily: "var(--font-code)",
+                  fontSize: "0.5rem",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  padding: "5px 12px",
+                  borderRadius: "100px",
+                  background: "transparent",
+                  border: `1px solid ${textColor}20`,
+                  color: `${textColor}40`,
+                }}
+              >
+                Proprietary
+              </span>
+            </div>
+
+            {/* Metrics */}
+            {project.metrics && (
+              <div className="flex flex-wrap gap-8">
+                {project.metrics.map((m) => (
+                  <div key={m.label}>
+                    <MetricVal value={m.value} color={textColor} />
+                    <div
+                      style={{
+                        fontFamily: "var(--font-code)",
+                        fontSize: "0.55rem",
+                        letterSpacing: "2px",
+                        textTransform: "uppercase",
+                        color: dimColor,
+                        marginTop: "4px",
+                      }}
+                    >
+                      {m.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right: architecture diagram */}
+          <div
+            ref={panelRef}
+            style={{
+              background: `${textColor}05`,
+              border: `1px solid ${textColor}15`,
+              borderRadius: "16px",
+              padding: "24px",
+              minHeight: "220px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              willChange: "transform",
+              transition: "transform 0.18s cubic-bezier(0.23, 1, 0.32, 1)",
+              cursor: "default",
+            }}
+          >
+            <ProjectVisual type={project.visual} textColor={textColor} dimColor={dimColor} />
+          </div>
+
+        </div>
+      </div>
+
+      {/* Bottom rule between sections */}
+      <div style={{ height: "1px", background: `${textColor}10` }} />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main export
+// ─────────────────────────────────────────────────────────────────────────────
+export function Projects() {
+  return (
+    <section id="work" className="relative z-[1]">
+
+      {/* Section header — dark bg before the color worlds begin */}
+      <div
+        style={{
+          background: "var(--color-bg)",
+          padding: "clamp(80px, 10vw, 130px) clamp(24px, 5vw, 64px) clamp(56px, 7vw, 90px)",
+        }}
+      >
+        <div className="max-w-[1300px] mx-auto">
+          <div className="gsap-fade-up flex items-baseline gap-4 mb-4">
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                fontWeight: 300,
+                color: "rgba(255,255,255,0.15)",
+                lineHeight: 1,
+              }}
+            >
+              /
+            </span>
+            <span
+              className="gsap-section-num"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 900,
+                fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                color: "var(--color-text)",
+                lineHeight: 0.85,
+                letterSpacing: "-4px",
+              }}
+            >
+              02
+            </span>
+            <span className="font-code uppercase tracking-[4px] text-[0.55rem] text-text-muted" style={{ alignSelf: "center" }}>
+              Work
+            </span>
+          </div>
+
+          <h2
+            className="font-display font-extrabold tracking-[-3px] leading-[0.9] gsap-fade-up"
+            style={{ fontSize: "clamp(2.4rem, 7vw, 6.5rem)", color: "var(--color-text)" }}
+            data-delay="0.08"
+          >
             Selected{" "}
-            <span className="serif-italic font-normal" style={{ color: "#f5f5f7" }}>
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 300,
+                letterSpacing: "-2px",
+                color: "var(--color-text-dim)",
+              }}
+            >
               projects
             </span>
           </h2>
-        </FadeUp>
 
-        {/* ── FEATURED CARD ── */}
-        <FadeUp delay={0.12}>
-          <div
-            className="gsap-project-card relative overflow-hidden rounded-3xl mb-5 group"
-            data-cursor="VIEW"
+          <p
+            className="gsap-fade-up"
             style={{
-              background:
-                "linear-gradient(135deg, #0e1a06 0%, #0e0e14 40%, #0a0a12 100%)",
-              border: "1px solid rgba(196,247,81,0.12)",
-              minHeight: "clamp(340px, 40vw, 480px)",
+              fontFamily: "var(--font-body)",
+              fontSize: "0.9rem",
+              color: "var(--color-text-muted)",
+              marginTop: "20px",
+              maxWidth: "460px",
+              lineHeight: 1.75,
             }}
+            data-delay="0.14"
           >
-            {/* Radial glow from bottom-left */}
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                inset: 0,
-                background:
-                  "radial-gradient(ellipse 55% 70% at 0% 110%, rgba(196,247,81,0.12) 0%, transparent 70%)",
-              }}
-            />
-
-            {/* Animated circuit decoration */}
-            <CircuitDecoration />
-
-            {/* Content */}
-            <div className="relative z-[1] p-8 md:p-12 lg:p-16 h-full flex flex-col justify-between">
-              {/* Top row */}
-              <div className="flex items-center gap-4 mb-8">
-                <span
-                  className="font-display font-black text-[5rem] md:text-[7rem] leading-none tracking-[-6px] select-none"
-                  style={{ color: "#c4f751", opacity: 0.12 }}
-                >
-                  01
-                </span>
-                <div
-                  className="h-px flex-1"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, rgba(196,247,81,0.3), transparent)",
-                  }}
-                />
-                <span
-                  className="font-code text-[0.5rem] tracking-[4px] uppercase px-3 py-1 rounded-full border"
-                  style={{
-                    color: "#c4f751",
-                    borderColor: "rgba(196,247,81,0.25)",
-                    background: "rgba(196,247,81,0.05)",
-                  }}
-                >
-                  Featured
-                </span>
-              </div>
-
-              {/* Title */}
-              <div className="mb-6">
-                <h3
-                  className="font-display font-extrabold tracking-[-1.5px] leading-[1.08] mb-4"
-                  style={{
-                    fontSize: "clamp(1.8rem, 4vw, 3.2rem)",
-                    color: "#f5f5f7",
-                  }}
-                >
-                  {featured.title}
-                </h3>
-                <p
-                  className="text-[0.9rem] md:text-[1rem] leading-[1.8] max-w-2xl"
-                  style={{ color: "#9b97a8" }}
-                >
-                  {featured.desc}
-                </p>
-              </div>
-
-              {/* Bottom row: metrics + tags */}
-              <div className="flex flex-wrap items-end justify-between gap-8">
-                {/* Metrics */}
-                <div className="flex flex-wrap gap-8 md:gap-12">
-                  {featured.metrics!.map((m) => (
-                    <MetricCounter key={m.label} value={m.value} label={m.label} />
-                  ))}
-                </div>
-
-                {/* Tags + links */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {featured.tags.map((tag, ti) => (
-                    <span
-                      key={tag}
-                      className="flex items-center gap-1.5 font-code text-[0.55rem] uppercase tracking-[1.5px] px-3 py-1 rounded-full"
-                      style={{
-                        color: "#c4f751",
-                        background: "rgba(196,247,81,0.07)",
-                        border: "1px solid rgba(196,247,81,0.18)",
-                      }}
-                    >
-                      <span
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: tagDotColors[ti % tagDotColors.length] }}
-                      />
-                      {tag}
-                    </span>
-                  ))}
-                  {/* Show "private" badge for featured since it's proprietary */}
-                  <span
-                    className="font-code text-[0.5rem] tracking-[2px] uppercase px-3 py-1 rounded-full"
-                    style={{ color: "rgba(196,247,81,0.3)", border: "1px solid rgba(196,247,81,0.1)" }}
-                  >
-                    Private
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </FadeUp>
-
-        {/* ── 2-COLUMN GRID ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-          {rest.map((project, i) => (
-            <FadeUp key={project.num} delay={0.06 * (i + 1)}>
-              <ProjectCard project={project} index={i} />
-            </FadeUp>
-          ))}
-        </div>
-
-        {/* Decorative "WORK" watermark */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-display font-black leading-none pointer-events-none select-none -z-[1]"
-          style={{
-            fontSize: "clamp(8rem, 18vw, 22rem)",
-            color: "rgba(255,255,255,0.012)",
-            letterSpacing: "-8px",
-            whiteSpace: "nowrap",
-          }}
-          aria-hidden="true"
-        >
-          WORK
+            Six production systems — all proprietary, all documented below with architecture diagrams.
+          </p>
         </div>
       </div>
+
+      {/* Per-project color world sections */}
+      {projects.map((project, i) => (
+        <ProjectSection key={project.num} project={project} index={i} />
+      ))}
     </section>
   );
 }

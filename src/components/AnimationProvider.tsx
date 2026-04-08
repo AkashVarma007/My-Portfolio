@@ -10,6 +10,7 @@ export function AnimationProvider() {
 
     // All standalone tweens (no ScrollTrigger) tracked here for cleanup
     const tweens: gsap.core.Tween[] = [];
+    const scrambleTimers: ReturnType<typeof setInterval>[] = [];
 
     // ── Scroll progress bar ───────────────────────────────────────────
     const progressBar = document.querySelector<HTMLElement>(".scroll-progress");
@@ -138,29 +139,6 @@ export function AnimationProvider() {
       });
     }
 
-    // ── Contact section coordinated reveal ───────────────────────────
-    const contactSection = document.querySelector<HTMLElement>("#contact");
-    if (contactSection) {
-      const contactEls = contactSection.querySelectorAll<HTMLElement>(".fade-up-element");
-      if (contactEls.length > 0) {
-        gsap.set(contactEls, { opacity: 0, y: 35 });
-        ScrollTrigger.create({
-          trigger: contactSection,
-          start: "top 72%",
-          toggleActions: "play none none none",
-          onEnter: () => {
-            gsap.to(contactEls, {
-              opacity: 1,
-              y: 0,
-              duration: 0.85,
-              stagger: 0.14,
-              ease: "power3.out",
-            });
-          },
-        });
-      }
-    }
-
     // ── Hero lines dramatic stagger on load ───────────────────────────
     const heroLines = document.querySelectorAll<HTMLElement>(".gsap-hero-line");
     if (heroLines.length > 0) {
@@ -195,11 +173,47 @@ export function AnimationProvider() {
     });
 
 
+    // ── Section number text scramble ─────────────────────────────────
+    const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const sectionNums = document.querySelectorAll<HTMLElement>(".gsap-section-num");
+    sectionNums.forEach((el) => {
+      const original = el.textContent ?? "";
+      let triggered = false;
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 90%",
+        toggleActions: "play none none none",
+        onEnter: () => {
+          if (triggered) return;
+          triggered = true;
+          let elapsed = 0;
+          const DURATION = 700;
+          const INTERVAL = 35;
+          const timer = setInterval(() => {
+            elapsed += INTERVAL;
+            if (elapsed >= DURATION) {
+              clearInterval(timer);
+              el.textContent = original;
+              return;
+            }
+            el.textContent = original
+              .split("")
+              .map((ch) =>
+                ch === " " ? " " : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+              )
+              .join("");
+          }, INTERVAL);
+          scrambleTimers.push(timer);
+        },
+      });
+    });
+
     // ── Refresh after setup ───────────────────────────────────────────
     ScrollTrigger.refresh();
 
     return () => {
       tweens.forEach((t) => t.kill());
+      scrambleTimers.forEach((t) => clearInterval(t));
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
