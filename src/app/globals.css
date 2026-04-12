@@ -136,3 +136,10 @@ body {
 
 .animate-orb-1 { animation: orb-1 25s ease-in-out infinite; }
 .animate-orb-2 { animation: orb-2 25s ease-in-out infinite 8s; }
+
+/* Project card hover — pure CSS, no JS mouse tracking */
+.project-card:hover {
+  border-color: rgba(255,255,255,0.10);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}

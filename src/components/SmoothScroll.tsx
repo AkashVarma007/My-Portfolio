@@ -12,9 +12,9 @@ export function SmoothScroll() {
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({
-      lerp: 0.07,
+      lerp: 0.12,
       smoothWheel: true,
-      wheelMultiplier: 0.8,
+      wheelMultiplier: 0.45,
     });
 
     // Named so we can remove the exact same reference on cleanup

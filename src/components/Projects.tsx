@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useState } from "react";
 import { FadeUp } from "./RevealText";
-import { TiltCard } from "./TiltCard";
 
 const projects = [
   {
@@ -136,7 +135,7 @@ function MetricCounter({ value, label }: { value: string; label: string }) {
   );
 }
 
-// Animated circuit SVG decoration for featured card
+// Static circuit SVG decoration for featured card
 function CircuitDecoration() {
   return (
     <svg
@@ -147,21 +146,14 @@ function CircuitDecoration() {
       fill="none"
       aria-hidden="true"
     >
-      <style>{`
-        @keyframes dash-flow {
-          to { stroke-dashoffset: -200; }
-        }
-        .circuit-line { animation: dash-flow 4s linear infinite; stroke-dasharray: 8 6; }
-        .circuit-line-slow { animation: dash-flow 7s linear infinite; stroke-dasharray: 12 8; }
-      `}</style>
       {/* Horizontal rails */}
-      <line className="circuit-line" x1="0" y1="80" x2="420" y2="80" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="0" y1="200" x2="420" y2="200" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="0" y1="320" x2="420" y2="320" stroke="#c4f751" strokeWidth="1" />
+      <line x1="0" y1="80" x2="420" y2="80" stroke="#c4f751" strokeWidth="1" strokeDasharray="8 6" />
+      <line x1="0" y1="200" x2="420" y2="200" stroke="#c4f751" strokeWidth="1" strokeDasharray="12 8" />
+      <line x1="0" y1="320" x2="420" y2="320" stroke="#c4f751" strokeWidth="1" strokeDasharray="8 6" />
       {/* Vertical rails */}
-      <line className="circuit-line-slow" x1="100" y1="0" x2="100" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="240" y1="0" x2="240" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="360" y1="0" x2="360" y2="420" stroke="#c4f751" strokeWidth="1" />
+      <line x1="100" y1="0" x2="100" y2="420" stroke="#c4f751" strokeWidth="1" strokeDasharray="12 8" />
+      <line x1="240" y1="0" x2="240" y2="420" stroke="#c4f751" strokeWidth="1" strokeDasharray="8 6" />
+      <line x1="360" y1="0" x2="360" y2="420" stroke="#c4f751" strokeWidth="1" strokeDasharray="12 8" />
       {/* Nodes */}
       {[
         [100, 80], [240, 80], [360, 80],
@@ -180,52 +172,22 @@ function CircuitDecoration() {
   );
 }
 
-// Non-featured project card
-function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
-  const [hovered, setHovered] = useState(false);
-
+// Non-featured project card — CSS-only hover, no JS mouse tracking
+function ProjectCard({ project }: { project: typeof projects[number] }) {
   return (
     <div
-      className="gsap-project-card h-full cursor-default"
-      data-cursor="VIEW"
+      className="gsap-project-card project-card h-full bg-[#111118] rounded-2xl relative overflow-hidden flex flex-col justify-between group"
       style={{
-        borderRadius: "1rem",
-        border: `1px solid ${hovered ? `${project.accent}30` : "rgba(255,255,255,0.05)"}`,
-        boxShadow: hovered
-          ? `0 0 40px ${project.accent}18, 0 8px 40px rgba(0,0,0,0.4)`
-          : "0 2px 20px rgba(0,0,0,0.3)",
-        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        border: "1px solid rgba(255,255,255,0.05)",
+        transition: "border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease",
+        ["--card-accent" as string]: project.accent,
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
-    <TiltCard
-      className={`h-full bg-[#111118] rounded-2xl relative overflow-hidden flex flex-col justify-between group`}
-    >
-      {/* Accent top border animated on hover */}
+      {/* Accent top border — visible on hover via group */}
       <div
+        className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400"
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "2px",
           background: `linear-gradient(90deg, transparent, ${project.accent}, transparent)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.4s ease",
-        }}
-      />
-
-      {/* Subtle hover gradient wash */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `radial-gradient(ellipse at 30% 20%, ${project.accent}08 0%, transparent 65%)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.5s ease",
-          pointerEvents: "none",
         }}
       />
 
@@ -233,12 +195,8 @@ function ProjectCard({ project, index }: { project: typeof projects[number]; ind
         {/* Number + accent dot row */}
         <div className="flex items-start justify-between mb-5">
           <span
-            className="font-display font-black text-[3.5rem] leading-none tracking-[-4px] select-none"
-            style={{
-              color: project.accent,
-              opacity: hovered ? 0.18 : 0.07,
-              transition: "opacity 0.4s ease",
-            }}
+            className="font-display font-black text-[3.5rem] leading-none tracking-[-4px] select-none opacity-[0.07] group-hover:opacity-[0.18] transition-opacity duration-400"
+            style={{ color: project.accent }}
           >
             {project.num}
           </span>
@@ -256,14 +214,8 @@ function ProjectCard({ project, index }: { project: typeof projects[number]; ind
           {project.title}
         </h3>
 
-        {/* Description — expands slightly on hover */}
-        <p
-          className="text-[0.8rem] leading-[1.75] flex-1"
-          style={{
-            color: "#9b97a8",
-            transition: "color 0.3s ease",
-          }}
-        >
+        {/* Description */}
+        <p className="text-[0.8rem] leading-[1.75] flex-1" style={{ color: "#9b97a8" }}>
           {project.desc}
         </p>
 
@@ -310,7 +262,6 @@ function ProjectCard({ project, index }: { project: typeof projects[number]; ind
           </div>
         </div>
       </div>
-    </TiltCard>
     </div>
   );
 }
@@ -342,7 +293,6 @@ export function Projects() {
         <FadeUp delay={0.12}>
           <div
             className="gsap-project-card relative overflow-hidden rounded-3xl mb-5 group"
-            data-cursor="VIEW"
             style={{
               background:
                 "linear-gradient(135deg, #0e1a06 0%, #0e0e14 40%, #0a0a12 100%)",
@@ -456,7 +406,7 @@ export function Projects() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {rest.map((project, i) => (
             <FadeUp key={project.num} delay={0.06 * (i + 1)}>
-              <ProjectCard project={project} index={i} />
+              <ProjectCard project={project} />
             </FadeUp>
           ))}
         </div>

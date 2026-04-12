@@ -136,6 +136,7 @@ export function AchievementWidget() {
       {/* Expanded panel */}
       {expanded && (
         <div
+          data-lenis-prevent
           style={{
             position: "fixed",
             bottom: 24,

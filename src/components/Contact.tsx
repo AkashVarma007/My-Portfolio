@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
@@ -8,23 +8,10 @@ type FormStatus = "idle" | "sending" | "sent" | "error";
 export function Contact() {
   const [focused, setFocused] = useState<string | null>(null);
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
   const clue10Found = isClueFound(10);
-
-  // Track mouse for interactive glow
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const handler = (e: MouseEvent) => {
-      const rect = section.getBoundingClientRect();
-      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    };
-    section.addEventListener("mousemove", handler);
-    return () => section.removeEventListener("mousemove", handler);
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,22 +48,7 @@ export function Contact() {
       ref={sectionRef}
       className="py-28 md:py-40 relative z-[1] overflow-hidden"
     >
-      {/* Interactive mouse-following glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute transition-opacity duration-300"
-        style={{
-          width: 500,
-          height: 500,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(196,247,81,0.06) 0%, transparent 70%)",
-          left: mousePos.x - 250,
-          top: mousePos.y - 250,
-          opacity: mousePos.x ? 1 : 0,
-        }}
-      />
-
-      {/* Animated grid background */}
+      {/* Grid background */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"

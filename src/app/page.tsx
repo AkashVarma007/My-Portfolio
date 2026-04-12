@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { HuntProvider } from "@/context/HuntContext";
-import { GradientMesh } from "@/components/GradientMesh";
+import { HuntProvider, useHunt } from "@/context/HuntContext";
+
 import { ParticleCanvas } from "@/components/ParticleCanvas";
 import { AnimationProvider } from "@/components/AnimationProvider";
 import { Navigation } from "@/components/Navigation";
@@ -21,6 +21,20 @@ import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
 import { HiddenTerminal } from "@/components/hunt/HiddenTerminal";
 import { SmoothScroll } from "@/components/SmoothScroll";
+
+/** Hunt UI — only renders after the user discovers the arcade (clue 1).
+ *  This keeps the mystery hidden until they find it themselves. */
+function HuntUI() {
+  const { isClueFound } = useHunt();
+  if (!isClueFound(1)) return null;
+  return (
+    <>
+      <AchievementWidget />
+      <ClueToast />
+      <HiddenTerminal />
+    </>
+  );
+}
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -41,7 +55,6 @@ export default function Home() {
       >
         <div className="scroll-progress" />
         <ParticleCanvas />
-        <GradientMesh />
         <AnimationProvider />
         <Navigation />
 
@@ -66,10 +79,8 @@ export default function Home() {
         {/* Hidden trigger — scrolling past the footer fires curtain → /arcade */}
         <ArcadeCurtain />
 
-        {/* Floating widgets */}
-        <AchievementWidget />
-        <ClueToast />
-        <HiddenTerminal />
+        {/* Hunt widgets — hidden until arcade is discovered */}
+        <HuntUI />
       </div>
     </HuntProvider>
   );
