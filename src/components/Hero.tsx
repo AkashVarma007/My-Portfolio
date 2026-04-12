@@ -4,21 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 
 const ROLES = [
-  "Systems Engineer",
-  "Platform Architect",
-  "DSL Designer",
-  "IoT Specialist",
+  "Platform Engineer",
+  "Fullstack Developer",
+  "IoT Builder",
 ];
 
 const TECH_ICONS = [
-  { label: "React",      icon: "⚛",  color: "#61dafb" },
-  { label: "Node",       icon: "⬡",  color: "#68a063" },
-  { label: "Docker",     icon: "🐳", color: "#2496ed" },
-  { label: "Redis",      icon: "⬡",  color: "#dc382d" },
-  { label: "TypeScript", icon: "TS", color: "#3178c6" },
-  { label: "K8s",        icon: "☸",  color: "#326ce5" },
-  { label: "MQTT",       icon: "⚡", color: "#c4f751" },
-  { label: "Postgres",   icon: "🐘", color: "#4169e1" },
+  { label: "React",      icon: "⚛",  color: "#61dafb", fact: "the frontend default for every project I've shipped" },
+  { label: "Node",       icon: "⬡",  color: "#68a063", fact: "my backend workhorse since I left ASP.NET" },
+  { label: "Docker",     icon: "🐳", color: "#2496ed", fact: "everything I ship runs inside a container" },
+  { label: "Redis",      icon: "⬡",  color: "#dc382d", fact: "holds the device-to-instance map for cross-cluster routing" },
+  { label: "TypeScript", icon: "TS", color: "#3178c6", fact: "non-negotiable for anything longer than a weekend" },
+  { label: "K8s",        icon: "☸",  color: "#326ce5", fact: "how our IoT platform scales horizontally" },
+  { label: "MQTT",       icon: "⚡", color: "#c4f751", fact: "the protocol that every device on my platform speaks" },
+  { label: "Postgres",   icon: "🐘", color: "#4169e1", fact: "my default for anything that needs to outlive a restart" },
 ];
 
 const STATS = [
@@ -129,20 +128,18 @@ export function Hero() {
   const clickSeqRef = useRef<string[]>([]);
   const [lastPressed, setLastPressed] = useState<string | null>(null);
   const [pressTick, setPressTick] = useState(0);
+  const [hoveredTech, setHoveredTech] = useState<typeof TECH_ICONS[number] | null>(null);
 
   return (
     <section id="hero-section" className="min-h-screen relative z-[1] flex flex-col justify-end pb-12 md:pb-16 px-6 md:px-12 overflow-hidden">
       {/* Orbiting tech icons — decorative background layer */}
       <div
-        aria-hidden
         className="absolute right-0 top-0 w-[640px] h-[640px] select-none"
-        style={{ opacity: 0.18, zIndex: 2 }}
+        style={{ opacity: 0.55, zIndex: 2 }}
       >
         {TECH_ICONS.map((tech, i) => {
           const angle = (i / TECH_ICONS.length) * 360;
           const radius = 230 + (i % 2) * 70;
-          const delay = i * 1.1;
-          const duration = 26 + (i % 3) * 6;
           const letter = ICON_LETTER[tech.label];
           const isPressed = lastPressed === tech.label;
 
@@ -157,13 +154,14 @@ export function Hero() {
                 height: 64,
                 marginTop: -32,
                 marginLeft: -32,
-                animation: `hero-orbit-${i % 2 === 0 ? "cw" : "ccw"} ${duration}s linear ${delay}s infinite`,
                 transformOrigin: `${-radius}px 0px`,
                 transform: `rotate(${angle}deg) translateX(${radius}px)`,
                 cursor: "pointer",
                 pointerEvents: "auto",
                 touchAction: "manipulation",
               }}
+              onMouseEnter={() => setHoveredTech(tech)}
+              onMouseLeave={() => setHoveredTech((h) => (h?.label === tech.label ? null : h))}
               onClick={() => {
                 if (!letter) return;
                 setLastPressed(tech.label);
@@ -203,6 +201,51 @@ export function Hero() {
             </div>
           );
         })}
+      </div>
+
+      {/* Tech fact tooltip — fixed top-right, fades in on icon hover */}
+      <div
+        className="hidden md:block absolute top-6 right-6 z-[5] pointer-events-none transition-all duration-300"
+        style={{
+          opacity: hoveredTech ? 1 : 0,
+          transform: hoveredTech ? "translateY(0)" : "translateY(-8px)",
+          maxWidth: 320,
+        }}
+      >
+        {hoveredTech && (
+          <div
+            className="rounded-xl p-4 backdrop-blur-md"
+            style={{
+              background: "rgba(8,8,12,0.85)",
+              border: `1px solid ${hoveredTech.color}55`,
+              boxShadow: `0 0 40px ${hoveredTech.color}22`,
+            }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className="w-7 h-7 rounded-md flex items-center justify-center font-code font-bold"
+                style={{
+                  background: `${hoveredTech.color}1a`,
+                  border: `1px solid ${hoveredTech.color}55`,
+                  color: hoveredTech.color,
+                  fontSize: hoveredTech.icon.length > 1 ? "11px" : "16px",
+                  lineHeight: 1,
+                }}
+              >
+                {hoveredTech.icon}
+              </div>
+              <span
+                className="font-display font-bold text-[0.85rem]"
+                style={{ color: hoveredTech.color }}
+              >
+                {hoveredTech.label}
+              </span>
+            </div>
+            <p className="font-code text-[0.65rem] leading-[1.65] text-text-dim">
+              {hoveredTech.fact}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="w-full max-w-[1300px] mx-auto relative">

@@ -11,9 +11,12 @@ export function AnimationProvider() {
     // All standalone tweens (no ScrollTrigger) tracked here for cleanup
     const tweens: gsap.core.Tween[] = [];
 
-    // ── Scroll progress bar ───────────────────────────────────────────
+    // ── Scroll progress bar (using transform, not width, to avoid reflow) ─
     const progressBar = document.querySelector<HTMLElement>(".scroll-progress");
     if (progressBar) {
+      progressBar.style.width = "100%";
+      progressBar.style.transformOrigin = "left center";
+      progressBar.style.transform = "scaleX(0)";
       tweens.push(
         gsap.to(progressBar, {
           scaleX: 1,
@@ -23,9 +26,6 @@ export function AnimationProvider() {
             start: "top top",
             end: "bottom bottom",
             scrub: 0,
-            onUpdate: (self) => {
-              progressBar.style.width = `${self.progress * 100}%`;
-            },
           },
         })
       );
@@ -75,24 +75,6 @@ export function AnimationProvider() {
           gsap.to(h, { clipPath: "inset(0 0% 0 0)", opacity: 1, duration: 1, ease: "power4.out" });
         },
       });
-    });
-
-    // ── Gradient orb parallax ─────────────────────────────────────────
-    const orbs = document.querySelectorAll<HTMLElement>(".gsap-orb");
-    orbs.forEach((orb, i) => {
-      const dir = i % 2 === 0 ? -1 : 1;
-      tweens.push(
-        gsap.to(orb, {
-          y: `${dir * 120}px`,
-          ease: "none",
-          scrollTrigger: {
-            trigger: document.body,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 2,
-          },
-        })
-      );
     });
 
     // ── Project cards staggered 3D tilt entry ─────────────────────────

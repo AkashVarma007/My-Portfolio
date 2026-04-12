@@ -7,11 +7,11 @@ import { useHunt } from "@/context/HuntContext";
 const timeline = [
   {
     year: "Y1",
-    phase: "The Foundation",
-    role: "Software Engineer @ Varsun eTechnologies",
-    period: "2022 – 2023",
-    text: "Pivoted from ASP.NET to React & Node.js. Built an EV charger platform with OCPP 1.6 — real-time monitoring, dashboards, and analytics. Delivered a full client product from scratch.",
-    stack: ["React", "Node.js", "OCPP 1.6", "EV Infra"],
+    phase: "B.Tech, Computer Science & Engineering",
+    role: "BV Raju Institute of Technology",
+    period: "2018 — 2022",
+    text: "Four years of CS fundamentals. Graduated into the last stretch of pandemic hiring, took a consultant-track offer to get shipping experience fast.",
+    stack: ["CS Fundamentals", "Hyderabad"],
     accentColor: "var(--color-accent-3)",
     glowColor: "rgba(251,146,60,0.18)",
     borderColor: "rgba(251,146,60,0.18)",
@@ -19,11 +19,11 @@ const timeline = [
   },
   {
     year: "Y2",
-    phase: "The Architect",
-    role: "Platform Engineer @ WaveFuel Solutions",
-    period: "2023 – 2024",
-    text: "Designed the IoT platform from scratch. Created FUS Script — a custom DSL. Built distributed WebSocket handling with Redis. Shipped a React Native app to both stores.",
-    stack: ["DSL Design", "Redis", "WebSockets", "React Native"],
+    phase: "Software Engineer",
+    role: "Varsun eTechnologies · consultant for WaveFuel",
+    period: "2022 — 2024",
+    text: "First real production ownership. Built an end-to-end EV charging platform on OCPP 1.6J — backend, dashboards, analytics, session recovery. Later shipped a cross-platform React Native SDK and consumer app to both Google Play and the iOS App Store.",
+    stack: ["TypeScript", "Node.js", "React", "OCPP 1.6J", "React Native"],
     accentColor: "var(--color-accent-2)",
     glowColor: "rgba(129,140,248,0.18)",
     borderColor: "rgba(129,140,248,0.18)",
@@ -31,11 +31,11 @@ const timeline = [
   },
   {
     year: "Y3",
-    phase: "The Leader",
-    role: "Platform Engineer @ WaveFuel Solutions",
-    period: "2024 – Present",
-    text: "Built form builders, MCP tools for AI chatbots, and a digital twin engine for 10K+ devices. Now mentoring 3 engineers and leading enterprise deployments worth ₹40L+.",
-    stack: ["Digital Twins", "AI / MCP", "Mentorship", "Enterprise"],
+    phase: "Platform Engineer",
+    role: "WaveFuel Solutions · Hyderabad",
+    period: "2024 — present",
+    text: "Architected the device-agnostic IoT platform and designed FUS Script — a runtime DSL for device protocols and data transformations. Built the Redis-backed distributed messaging layer that handles cross-instance WebSocket delivery. Mentor two junior engineers and an intern on the platform team.",
+    stack: ["DSL Design", "Distributed Systems", "Redis", "Kubernetes", "Mentorship"],
     accentColor: "var(--color-accent)",
     glowColor: "rgba(196,247,81,0.18)",
     borderColor: "rgba(196,247,81,0.18)",
@@ -389,8 +389,19 @@ function DesktopTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; on
 }
 
 function YearBadge({ item, onClick, clue7Found }: { item: typeof timeline[0]; onClick?: () => void; clue7Found?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+
+  // Fake 12-month "workload" filmstrip — deterministic from index, just vibes
+  const seed = item.year.charCodeAt(1);
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const v = ((seed * (i + 3)) % 17) / 17; // 0..1
+    return 0.35 + v * 0.65; // 0.35..1
+  });
+
   return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onClick={clue7Found && onClick ? onClick : undefined}
       style={{
         width: "52px",
@@ -430,6 +441,53 @@ function YearBadge({ item, onClick, clue7Found }: { item: typeof timeline[0]; on
           animation: "ring-pulse 2.5s ease-in-out infinite",
         }}
       />
+
+      {/* Hover micro-timeline — 12 month filmstrip */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "calc(100% + 14px)",
+          left: "50%",
+          transform: `translateX(-50%) translateY(${hovered ? 0 : "6px"})`,
+          opacity: hovered ? 1 : 0,
+          pointerEvents: "none",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
+          background: "rgba(8,8,12,0.9)",
+          border: `1px solid ${item.accentColor}55`,
+          borderRadius: "10px",
+          padding: "10px 12px",
+          whiteSpace: "nowrap",
+          backdropFilter: "blur(6px)",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-code)",
+            fontSize: "0.5rem",
+            letterSpacing: "2px",
+            textTransform: "uppercase",
+            color: item.accentColor,
+            marginBottom: "6px",
+          }}
+        >
+          {item.period}
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: "3px", height: "18px" }}>
+          {months.map((v, i) => (
+            <div
+              key={i}
+              style={{
+                width: "4px",
+                height: `${Math.round(v * 18)}px`,
+                background: item.accentColor,
+                opacity: 0.5 + v * 0.5,
+                borderRadius: "1px",
+              }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -619,12 +677,13 @@ export function Journey() {
       <div className="max-w-[1300px] mx-auto px-6 md:px-12 relative" style={{ zIndex: 1 }}>
         <FadeUp>
           <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-text-muted block mb-4">
-            03 / Journey
+            05 / Experience
           </span>
         </FadeUp>
         <FadeUp delay={0.08}>
           <h2 className="font-display text-[clamp(1.6rem,4vw,3.2rem)] font-extrabold tracking-[-2px] leading-[1.1] mb-14">
-            The <span className="serif-italic font-normal">evolution</span>
+            Where I&apos;ve{" "}
+            <span className="serif-italic font-normal">worked</span>.
           </h2>
         </FadeUp>
 

@@ -15,12 +15,12 @@ import { Skills } from "@/components/Skills";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Preloader } from "@/components/Preloader";
-import { CustomCursor } from "@/components/CustomCursor";
 import { ArcadeCurtain } from "@/components/ArcadeCurtain";
 import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
 import { HiddenTerminal } from "@/components/hunt/HiddenTerminal";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { MetaCorner } from "@/components/MetaCorner";
 
 export default function Home() {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -29,7 +29,6 @@ export default function Home() {
   return (
     <HuntProvider>
       <SmoothScroll />
-      <CustomCursor />
       <Preloader onComplete={handlePreloaderComplete} />
 
       <div
@@ -48,18 +47,11 @@ export default function Home() {
         <Hero />
         <Marquee />
 
-        <About />
-        <div className="divider-glow mx-6 md:mx-12" />
-
+        {/* Plan order: work → about → stack → experience → contact */}
         <Projects />
-        <div className="divider-glow mx-6 md:mx-12" />
-
-        <Journey />
-        <div className="divider-glow mx-6 md:mx-12" />
-
+        <About />
         <Skills />
-        <div className="divider-glow mx-6 md:mx-12" />
-
+        <Journey />
         <Contact />
         <Footer />
 
@@ -70,6 +62,9 @@ export default function Home() {
         <AchievementWidget />
         <ClueToast />
         <HiddenTerminal />
+
+        {/* WOW 5 — the self-referential meta corner */}
+        <MetaCorner />
       </div>
     </HuntProvider>
   );

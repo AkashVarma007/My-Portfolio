@@ -82,12 +82,14 @@ body {
   top: 0;
   left: 0;
   height: 2px;
-  width: 0%;
+  width: 100%;
   background: var(--color-accent);
   z-index: 9999;
   transform-origin: left;
+  transform: scaleX(0);
   box-shadow: 0 0 8px rgba(196, 247, 81, 0.5);
   pointer-events: none;
+  will-change: transform;
 }
 
 /* Hero entry animations */

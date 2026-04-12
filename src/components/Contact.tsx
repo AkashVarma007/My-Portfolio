@@ -8,6 +8,7 @@ type FormStatus = "idle" | "sending" | "sent" | "error";
 export function Contact() {
   const [focused, setFocused] = useState<string | null>(null);
   const [status, setStatus] = useState<FormStatus>("idle");
+  const [messageLength, setMessageLength] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -93,7 +94,7 @@ export function Contact() {
         {/* Header */}
         <div className="fade-up-element mb-16">
           <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-text-muted block mb-4">
-            05 / Contact
+            06 / Contact
           </span>
           <h2 className="font-display text-[clamp(2rem,5vw,4rem)] font-extrabold tracking-[-2px] leading-[1.05]">
             Let&rsquo;s build something
@@ -124,24 +125,52 @@ export function Contact() {
                 setFocused={setFocused}
               />
               <div>
-                <label
-                  htmlFor="contact-message"
-                  className="block font-code text-[0.55rem] tracking-[4px] uppercase text-text-muted mb-2.5"
-                >
-                  Message
-                </label>
+                <div className="flex items-baseline justify-between mb-2.5">
+                  <label
+                    htmlFor="contact-message"
+                    className="block font-code text-[0.55rem] tracking-[4px] uppercase text-text-muted"
+                  >
+                    Message
+                  </label>
+                  <span
+                    className="font-code text-[0.55rem] tracking-[1px] transition-colors duration-300"
+                    style={{
+                      color:
+                        messageLength === 0
+                          ? "var(--color-text-muted)"
+                          : messageLength < 50
+                          ? "#fb923c"
+                          : "var(--color-accent)",
+                    }}
+                  >
+                    {messageLength === 0
+                      ? "0 chars"
+                      : messageLength < 50
+                      ? `${messageLength} / 50 — keep going`
+                      : `${messageLength} chars — perfect`}
+                  </span>
+                </div>
                 <textarea
                   id="contact-message"
                   name="message"
                   rows={5}
                   required
                   placeholder="Tell me about your project or idea..."
+                  onChange={(e) => setMessageLength(e.target.value.length)}
                   onFocus={() => setFocused("message")}
                   onBlur={() => setFocused(null)}
                   className="contact-input"
                   style={{
-                    borderColor: focused === "message" ? "var(--color-accent)" : undefined,
-                    boxShadow: focused === "message" ? "0 0 0 3px rgba(196,247,81,0.06), 0 0 20px rgba(196,247,81,0.04)" : undefined,
+                    borderColor:
+                      messageLength >= 50
+                        ? "var(--color-accent)"
+                        : focused === "message"
+                        ? "var(--color-accent)"
+                        : undefined,
+                    boxShadow:
+                      focused === "message" || messageLength >= 50
+                        ? "0 0 0 3px rgba(196,247,81,0.06), 0 0 20px rgba(196,247,81,0.04)"
+                        : undefined,
                     resize: "vertical",
                     minHeight: 130,
                   }}

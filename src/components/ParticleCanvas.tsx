@@ -33,11 +33,14 @@ export function ParticleCanvas() {
 
     let animFrameId: number;
     let particles: Particle[] = [];
-    let mouse = { x: -9999, y: -9999 };
+    const mouse = { x: -9999, y: -9999 };
     let messageVisible = false;
     let messageUntil = 0;
     let nextMessageAt = performance.now() + 20000;
     let textPoints: Array<{ x: number; y: number }> = [];
+    let isVisible = true;
+    let lastFrameTime = 0;
+    const FRAME_INTERVAL = 1000 / 30; // Cap at 30fps to reduce GPU load
     const TEXT = "ORDER";
     const TEXT_PARTICLE_RATIO = 0.22;
 
@@ -45,8 +48,15 @@ export function ParticleCanvas() {
     const MOUSE_RADIUS = 200;
     const MOUSE_FORCE = 0.6;
 
+    // Pause the canvas when it's not in the viewport (user is past the hero)
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    visibilityObserver.observe(canvas);
+
     function getParticleCount() {
-      return window.innerWidth < 768 ? 40 : 70;
+      return window.innerWidth < 768 ? 30 : 50;
     }
 
     function resize() {
@@ -97,7 +107,14 @@ export function ParticleCanvas() {
     }
 
     function draw() {
+      animFrameId = requestAnimationFrame(draw);
       const now = performance.now();
+
+      // Throttle to FRAME_INTERVAL and pause when off-screen
+      if (!isVisible) return;
+      if (now - lastFrameTime < FRAME_INTERVAL) return;
+      lastFrameTime = now;
+
       const { canAttemptClue, isClueFound, unlockClue } = huntRef.current;
       const clue11Active = canAttemptClue(12) && !isClueFound(12);
       if (clue11Active) {
@@ -189,7 +206,6 @@ export function ParticleCanvas() {
         }
       }
 
-      animFrameId = requestAnimationFrame(draw);
     }
 
     function onMouseMove(e: MouseEvent) {
@@ -228,6 +244,7 @@ export function ParticleCanvas() {
 
     return () => {
       cancelAnimationFrame(animFrameId);
+      visibilityObserver.disconnect();
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);

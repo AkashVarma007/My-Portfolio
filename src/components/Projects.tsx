@@ -1,465 +1,508 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FadeUp } from "./RevealText";
-import { TiltCard } from "./TiltCard";
+import { FusScriptDemo } from "./FusScriptDemo";
 
-const projects = [
+type CaseStudy = {
+  num: string;
+  title: string;
+  tagline: string;
+  role: string;
+  year: string;
+  stack: string[];
+  paragraphs: { heading: string; body: string }[];
+  accent: string;
+  github?: string;
+  demo?: string;
+  private?: boolean;
+  playground?: boolean;
+  architecture?: boolean;
+  aside?: string;
+};
+
+const caseStudies: CaseStudy[] = [
   {
     num: "01",
-    title: "Device-Agnostic IoT Platform",
-    desc: "A platform that onboards any device, any protocol — without new code. Powered by FUS Script, a custom DSL I designed for runtime protocol definitions and data transformations. Distributed Redis-based messaging handles thousands of concurrent connections.",
-    tags: ["TypeScript", "DSL", "Redis", "MQTT", "WebSockets"],
-    metrics: [
-      { value: "40%", label: "Faster Integration" },
-      { value: "10K+", label: "Concurrent Devices" },
-      { value: "₹40L+", label: "Project Value" },
+    title: "FUS Script + Device-Agnostic IoT Platform",
+    tagline: "Onboard any device. Any protocol. Without a redeploy.",
+    role: "Platform Engineer · WaveFuel Solutions",
+    year: "2024 — present",
+    stack: ["TypeScript", "Node.js", "PostgreSQL", "Redis", "MQTT", "WebSockets", "Docker", "Kubernetes"],
+    paragraphs: [
+      {
+        heading: "The problem",
+        body: "Every new client came with a different device, a different protocol, and a different data contract. Onboarding each one meant days of custom code and a redeploy. The platform didn't scale with the pipeline.",
+      },
+      {
+        heading: "What I built",
+        body: "I designed FUS Script — a custom domain-specific language and runtime parser that lets us define device protocols and data transformations at runtime. Adding a new device type means writing a FUS Script definition, not shipping code. The parser handles field-level data mapping and runtime operations like RSA encryption on specific outbound fields. Around it I built the ingest and messaging layer — a Redis-backed routing system that handles cross-instance WebSocket delivery in a clustered load-balanced environment, so a message sent by the user reaches the right device regardless of which backend instance holds the connection.",
+      },
+      {
+        heading: "What was hard",
+        body: "Two things. First, making the DSL flexible yet rigid — flexible enough to cover arbitrary device protocols, rigid enough that the parser rejects bad definitions at parse time, not runtime. Second, the cross-instance routing: a load-balanced cluster means a device and its user can be on different server instances, and messages have to find the device without broadcasting. Redis holds the device-to-instance map; the messaging layer reads it before dispatch.",
+      },
     ],
     accent: "#c4f751",
-    featured: true,
-    github: "", // add GitHub URL if public
-    demo: "",   // add live demo URL if available
+    private: true,
+    playground: true,
+    architecture: true,
   },
   {
     num: "02",
-    title: "EV Charging Infrastructure",
-    desc: "End-to-end platform with OCPP 1.6J. Real-time monitoring, analytics dashboards, sub-second telemetry, ~99% uptime.",
-    tags: ["Node.js", "OCPP 1.6", "React"],
+    title: "EV Charging Infrastructure (OCPP 1.6J)",
+    tagline: "Production EV charging, end-to-end.",
+    role: "Software Engineer · Varsun eTechnologies (consultant for WaveFuel)",
+    year: "2022 — 2024",
+    stack: ["TypeScript", "Node.js", "React", "OCPP 1.6J", "WebSockets"],
+    paragraphs: [
+      {
+        heading: "The problem",
+        body: "Deliver a full EV charging platform from scratch on the OCPP 1.6J protocol — onboarding, monitoring, control, per-site dashboards. The first real production system I owned end-to-end.",
+      },
+      {
+        heading: "What I built",
+        body: "A multi-site EV charger management platform. Clients can onboard OCPP-compatible chargers, assign them to sites, monitor live telemetry, trigger remote commands, and see analytics dashboards for utilization and power consumption. Full-stack: backend message handling against OCPP, frontend dashboard and site admin, and the telemetry pipeline feeding the analytics layer.",
+      },
+      {
+        heading: "What was hard",
+        body: "OCPP 1.6J is a chatty, strict protocol. Sub-second telemetry requires careful WebSocket handling and efficient session state so the platform can hold thousands of charger sessions without drifting. I spent real time on the session layer — specifically on how to cleanly recover a charger's state after a dropped connection without replaying the whole session.",
+      },
+    ],
     accent: "#818cf8",
-    featured: false,
-    github: "",
-    demo: "",
+    private: true,
   },
   {
     num: "03",
-    title: "IoT Mobile App",
-    desc: "Cross-platform app for device onboarding, analytics, team management, and automation. Shipped to Play Store & App Store.",
-    tags: ["React Native", "IoT", "Cross-Platform"],
-    accent: "#fb923c",
-    featured: false,
-    github: "",
-    demo: "",
+    title: "Digital Twin Simulation Engine",
+    tagline: "A reusable simulator for any industry's IoT devices.",
+    role: "Platform Engineer · WaveFuel Solutions",
+    year: "2024",
+    stack: ["TypeScript", "Node.js", "Event-Driven", "MQTT"],
+    paragraphs: [
+      {
+        heading: "The problem",
+        body: "Load tests, client demos, and architecture reviews all required physical IoT devices. Physical devices are slow to procure, expensive, and don't scale past tens. We needed a way to simulate thousands of realistic devices without hardware.",
+      },
+      {
+        heading: "What I built",
+        body: "A plug-and-play simulation engine. The first implementation modeled the dairy industry — I researched end-to-end data flows, the sensors and actuators involved, the alerting patterns. That research became a reusable simulation base: the same engine can simulate a different industry by swapping in new device definitions. It feeds our real IoT platform, so the devices look and behave like real ones from the server's perspective.",
+      },
+      {
+        heading: "What was hard",
+        body: "Making the engine generic without making it toothless. I wanted 'define a new industry in a config, get a working simulator' — not 'build a new engine per industry.' The hard part was designing the device abstraction so the dairy-specific work didn't leak into the base. Stress-tested with 10,000+ concurrent simulated devices across multiple industries, with no physical hardware.",
+      },
+    ],
+    accent: "#c4f751",
+    private: true,
   },
   {
     num: "04",
-    title: "Digital Twin Engine",
-    desc: "Plug-and-play simulation engine for 10K+ virtual IoT devices across industries.",
-    tags: ["Simulation", "Event-Driven"],
-    accent: "#c4f751",
-    featured: false,
-    github: "",
-    demo: "",
-  },
-  {
-    num: "05",
-    title: "Autonomous Job Manager",
-    desc: "AI-driven orchestration in isolated Docker containers with automated error recovery.",
-    tags: ["AI", "Docker", "Async"],
-    accent: "#818cf8",
-    featured: false,
-    github: "",
-    demo: "",
-  },
-  {
-    num: "06",
-    title: "Sonar Analysis Platform",
-    desc: "Audio-based sonar data → heatmaps and charts. Python processing, Next.js visualization.",
-    tags: ["Python", "Next.js"],
+    title: "IoT Mobile SDK + Consumer App",
+    tagline: "Shipped to both stores. Mobile sync is where joy goes to die.",
+    role: "Software Engineer · Varsun eTechnologies",
+    year: "2023 — 2024",
+    stack: ["React Native", "TypeScript", "BLE", "Wi-Fi Provisioning"],
+    paragraphs: [
+      {
+        heading: "The problem",
+        body: "A client needed a consumer-facing mobile app where end-users could onboard the client's IoT devices, share access with family members, create automation scenes and routines, and see usage analytics. Had to ship cross-platform.",
+      },
+      {
+        heading: "What I built",
+        body: "A React Native app and the cross-platform SDK underneath it. The SDK abstracts device onboarding — BLE pairing, Wi-Fi provisioning, handshake with the server, ownership assignment — so the app code doesn't have to know about any of it. The app wraps the SDK with user-facing flows: adding a device, inviting a household member, building a scene, viewing analytics. Shipped to both Google Play and the iOS App Store.",
+      },
+      {
+        heading: "The honest note",
+        body: "This is also the project that taught me how much pain there is in cross-platform mobile state sync. Between BLE reconnect storms, OS-level background restrictions, and the two platforms disagreeing on how to handle provisioning, most of the work was making the SDK feel reliable even when the underlying conditions aren't.",
+      },
+    ],
     accent: "#fb923c",
-    featured: false,
-    github: "",
-    demo: "",
+    private: true,
+    aside: "Mobile sync is where joy goes to die.",
   },
 ];
 
-// Tag dot colors cycle
-const tagDotColors = ["#c4f751", "#818cf8", "#fb923c", "#38bdf8", "#f472b6"];
+const alsoShipped = [
+  {
+    title: "Autonomous Job Manager",
+    year: "2023",
+    desc: "AI-driven async task orchestration in isolated Docker containers with automated error recovery.",
+    stack: "Node.js · Docker",
+  },
+  {
+    title: "Form Builder",
+    year: "2024",
+    desc: "Drag-and-drop grid form builder used by a client to generate iframe-embeddable forms for their website.",
+    stack: "React · Next.js",
+  },
+  {
+    title: "Sonar Audio Analysis Tool",
+    year: "2023",
+    desc: "Audio signal processing pipeline generating heatmaps from sonar recordings for object identification.",
+    stack: "Python · Next.js",
+  },
+  {
+    title: "AI Chatbot MCP Tool Server",
+    year: "2025",
+    desc: "Designed and documented the MCP tool surface so an AI chatbot could perform every operation the IoT platform supports.",
+    stack: "TypeScript · MCP",
+  },
+];
 
-// Animated metric counter
-function MetricCounter({ value, label }: { value: string; label: string }) {
-  const [displayed, setDisplayed] = useState("0");
+/**
+ * Drag-to-reveal overlay for the flagship case study's architecture diagram.
+ * Pure CSS + pointer events — no GSAP needed. Tracks pointer while dragging
+ * and eats away the overlay using a radial-gradient mask.
+ */
+function DragToRevealArchitecture() {
   const ref = useRef<HTMLDivElement>(null);
-  const animatedRef = useRef(false);
+  const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+  const [dragging, setDragging] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
-  useEffect(() => {
+  const addPoint = useCallback((clientX: number, clientY: number) => {
     const el = ref.current;
     if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
+    setPoints((prev) => {
+      const next = [...prev, { x, y }];
+      if (next.length > 60) next.splice(0, next.length - 60);
+      if (next.length >= 20) setRevealed(true);
+      return next;
+    });
+  }, []);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !animatedRef.current) {
-          animatedRef.current = true;
-          // Extract numeric part and suffix
-          const match = value.match(/^([₹]?)(\d+(?:\.\d+)?)([KL%+]*)?$/);
-          if (!match) {
-            setDisplayed(value);
-            return;
-          }
-          const prefix = match[1] || "";
-          const num = parseFloat(match[2]);
-          const suffix = match[3] || "";
-          const duration = 1200;
-          const start = performance.now();
-
-          function tick(now: number) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = Math.floor(eased * num);
-            setDisplayed(`${prefix}${current}${suffix}`);
-            if (progress < 1) requestAnimationFrame(tick);
-            else setDisplayed(value);
-          }
-
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [value]);
+  const maskImage = points.length
+    ? points
+        .map((p) => `radial-gradient(circle 70px at ${p.x}% ${p.y}%, transparent 0%, transparent 40%, black 100%)`)
+        .join(", ")
+    : undefined;
 
   return (
-    <div ref={ref} className="flex flex-col gap-1">
-      <span
-        className="font-display font-black text-3xl md:text-4xl tracking-tight"
-        style={{ color: "#c4f751" }}
+    <div
+      ref={ref}
+      className="relative rounded-2xl overflow-hidden select-none touch-none"
+      style={{
+        background: "rgba(10,10,14,0.7)",
+        border: "1px solid rgba(196,247,81,0.15)",
+        aspectRatio: "16 / 7",
+      }}
+      onPointerDown={(e) => {
+        (e.target as Element).setPointerCapture?.(e.pointerId);
+        setDragging(true);
+        addPoint(e.clientX, e.clientY);
+      }}
+      onPointerMove={(e) => {
+        if (dragging) addPoint(e.clientX, e.clientY);
+      }}
+      onPointerUp={() => setDragging(false)}
+      onPointerCancel={() => setDragging(false)}
+    >
+      {/* Architecture diagram (the thing being revealed) */}
+      <div className="absolute inset-0 p-6 md:p-8 flex items-center justify-between gap-4 font-code text-[0.6rem] md:text-[0.7rem] tracking-[1.5px] uppercase">
+        {[
+          { label: "Device", sub: "MQTT / TCP" },
+          { label: "FUS Parser", sub: "DSL runtime" },
+          { label: "Redis Router", sub: "instance map" },
+          { label: "WS Gateway", sub: "cluster-aware" },
+          { label: "User", sub: "browser / app" },
+        ].map((node, i, arr) => (
+          <div key={node.label} className="flex items-center flex-1">
+            <div
+              className="flex-1 flex flex-col items-center gap-1 rounded-md px-2 py-3"
+              style={{
+                border: "1px solid rgba(196,247,81,0.3)",
+                background: "rgba(196,247,81,0.04)",
+                color: "#c4f751",
+              }}
+            >
+              <span className="font-bold text-[0.7rem] md:text-[0.8rem] normal-case tracking-normal">
+                {node.label}
+              </span>
+              <span className="text-[0.55rem] opacity-60">{node.sub}</span>
+            </div>
+            {i < arr.length - 1 && (
+              <div
+                className="h-px w-3 md:w-5 flex-shrink-0"
+                style={{ background: "rgba(196,247,81,0.4)" }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* The overlay that erases on drag */}
+      <div
+        className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(196,247,81,0.08), rgba(0,0,0,0.95))",
+          maskImage,
+          WebkitMaskImage: maskImage,
+          maskComposite: "intersect",
+          WebkitMaskComposite: "source-in",
+          opacity: revealed ? 0 : 1,
+          pointerEvents: revealed ? "none" : "auto",
+        }}
       >
-        {displayed}
-      </span>
-      <span className="font-code text-[0.5rem] uppercase tracking-[3px] text-[#56526a]">
-        {label}
-      </span>
+        <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
+          <span
+            className="font-code text-[0.65rem] tracking-[4px] uppercase"
+            style={{ color: "#c4f751" }}
+          >
+            drag to reveal architecture
+          </span>
+          <span
+            className="font-code text-[0.55rem] tracking-[2px] uppercase"
+            style={{ color: "#9b97a8" }}
+          >
+            ↓ ↓ ↓
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
 
-// Animated circuit SVG decoration for featured card
-function CircuitDecoration() {
-  return (
-    <svg
-      className="absolute right-0 top-0 opacity-[0.07] pointer-events-none select-none"
-      width="420"
-      height="420"
-      viewBox="0 0 420 420"
-      fill="none"
-      aria-hidden="true"
-    >
-      <style>{`
-        @keyframes dash-flow {
-          to { stroke-dashoffset: -200; }
-        }
-        .circuit-line { animation: dash-flow 4s linear infinite; stroke-dasharray: 8 6; }
-        .circuit-line-slow { animation: dash-flow 7s linear infinite; stroke-dasharray: 12 8; }
-      `}</style>
-      {/* Horizontal rails */}
-      <line className="circuit-line" x1="0" y1="80" x2="420" y2="80" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="0" y1="200" x2="420" y2="200" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="0" y1="320" x2="420" y2="320" stroke="#c4f751" strokeWidth="1" />
-      {/* Vertical rails */}
-      <line className="circuit-line-slow" x1="100" y1="0" x2="100" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line" x1="240" y1="0" x2="240" y2="420" stroke="#c4f751" strokeWidth="1" />
-      <line className="circuit-line-slow" x1="360" y1="0" x2="360" y2="420" stroke="#c4f751" strokeWidth="1" />
-      {/* Nodes */}
-      {[
-        [100, 80], [240, 80], [360, 80],
-        [100, 200], [240, 200], [360, 200],
-        [100, 320], [240, 320], [360, 320],
-      ].map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="4" fill="#c4f751" />
-      ))}
-      {/* Small decorative squares at some nodes */}
-      {[
-        [100, 80], [240, 200], [360, 320],
-      ].map(([cx, cy], i) => (
-        <rect key={i} x={cx - 8} y={cy - 8} width="16" height="16" rx="2" stroke="#c4f751" strokeWidth="1" fill="none" />
-      ))}
-    </svg>
-  );
-}
-
-// Non-featured project card
-function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
-  const [hovered, setHovered] = useState(false);
+/**
+ * CaseStudyCard — the full-depth card used for all 4 featured case studies.
+ * Supports the multi-paragraph format, a stack rail, optional FUS playground,
+ * and the drag-to-reveal architecture for the flagship.
+ */
+function CaseStudyCard({ cs }: { cs: CaseStudy }) {
+  const isFeatured = cs.num === "01";
 
   return (
     <div
-      className="gsap-project-card h-full cursor-default"
-      data-cursor="VIEW"
+      className="gsap-project-card relative overflow-hidden rounded-3xl"
       style={{
-        borderRadius: "1rem",
-        border: `1px solid ${hovered ? `${project.accent}30` : "rgba(255,255,255,0.05)"}`,
-        boxShadow: hovered
-          ? `0 0 40px ${project.accent}18, 0 8px 40px rgba(0,0,0,0.4)`
-          : "0 2px 20px rgba(0,0,0,0.3)",
-        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        background: isFeatured
+          ? "linear-gradient(135deg, #0e1a06 0%, #0e0e14 40%, #0a0a12 100%)"
+          : "rgba(14,14,20,0.6)",
+        border: `1px solid ${cs.accent}1f`,
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
-    <TiltCard
-      className={`h-full bg-[#111118] rounded-2xl relative overflow-hidden flex flex-col justify-between group`}
-    >
-      {/* Accent top border animated on hover */}
+      {/* Radial glow */}
       <div
+        className="absolute pointer-events-none"
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "2px",
-          background: `linear-gradient(90deg, transparent, ${project.accent}, transparent)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.4s ease",
-        }}
-      />
-
-      {/* Subtle hover gradient wash */}
-      <div
-        style={{
-          position: "absolute",
           inset: 0,
-          background: `radial-gradient(ellipse at 30% 20%, ${project.accent}08 0%, transparent 65%)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.5s ease",
-          pointerEvents: "none",
+          background: `radial-gradient(ellipse 55% 70% at 0% 100%, ${cs.accent}15 0%, transparent 70%)`,
         }}
       />
 
-      <div className="relative z-[1] p-6 md:p-7 flex flex-col h-full">
-        {/* Number + accent dot row */}
-        <div className="flex items-start justify-between mb-5">
+      <div className="relative z-[1] p-7 md:p-10 lg:p-12">
+        {/* Top row: num + separator + featured badge */}
+        <div className="flex items-center gap-4 mb-8">
           <span
-            className="font-display font-black text-[3.5rem] leading-none tracking-[-4px] select-none"
+            className="font-display font-black leading-none tracking-[-4px] select-none"
             style={{
-              color: project.accent,
-              opacity: hovered ? 0.18 : 0.07,
-              transition: "opacity 0.4s ease",
+              fontSize: "clamp(3rem, 6vw, 5.5rem)",
+              color: cs.accent,
+              opacity: 0.14,
             }}
           >
-            {project.num}
+            {cs.num}
           </span>
-          <span
-            className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-            style={{ background: project.accent, opacity: 0.6 }}
+          <div
+            className="h-px flex-1"
+            style={{ background: `linear-gradient(90deg, ${cs.accent}40, transparent)` }}
           />
+          <span
+            className="font-code text-[0.5rem] tracking-[3px] uppercase"
+            style={{ color: cs.accent, opacity: 0.7 }}
+          >
+            {cs.year}
+          </span>
         </div>
 
-        {/* Title */}
+        {/* Title + tagline */}
         <h3
-          className="font-display text-base md:text-lg font-bold tracking-[-0.3px] mb-3 leading-snug"
-          style={{ color: "#f5f5f7" }}
-        >
-          {project.title}
-        </h3>
-
-        {/* Description — expands slightly on hover */}
-        <p
-          className="text-[0.8rem] leading-[1.75] flex-1"
+          className="font-display font-extrabold tracking-[-1px] leading-[1.08] mb-3"
           style={{
-            color: "#9b97a8",
-            transition: "color 0.3s ease",
+            fontSize: "clamp(1.6rem, 3.2vw, 2.6rem)",
+            color: "#f5f5f7",
           }}
         >
-          {project.desc}
+          {cs.title}
+        </h3>
+        <p
+          className="text-[0.85rem] md:text-[0.95rem] leading-[1.6] mb-2 serif-italic"
+          style={{ color: cs.accent, opacity: 0.85 }}
+        >
+          {cs.tagline}
+        </p>
+        <p
+          className="font-code text-[0.6rem] tracking-[2px] uppercase mb-8"
+          style={{ color: "#56526a" }}
+        >
+          {cs.role}
         </p>
 
-        {/* Tags + links row */}
-        <div className="flex items-end justify-between gap-2 mt-5 pt-4 border-t border-[rgba(255,255,255,0.05)]">
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag, ti) => (
-              <span key={tag} className="flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: tagDotColors[ti % tagDotColors.length] }}
-                />
-                <span
-                  className="font-code text-[0.55rem] uppercase tracking-[1.5px]"
-                  style={{ color: "#56526a" }}
-                >
-                  {tag}
-                </span>
+        {/* Paragraphs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8">
+          {cs.paragraphs.map((p) => (
+            <div key={p.heading} className="flex flex-col gap-2">
+              <span
+                className="font-code text-[0.55rem] tracking-[2.5px] uppercase"
+                style={{ color: cs.accent, opacity: 0.75 }}
+              >
+                {p.heading}
               </span>
-            ))}
+              <p
+                className="text-[0.78rem] md:text-[0.82rem] leading-[1.75]"
+                style={{ color: "#9b97a8" }}
+              >
+                {p.body}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {cs.aside && (
+          <p
+            className="serif-italic text-[0.85rem] leading-relaxed mb-8"
+            style={{ color: "#d7d4e0", opacity: 0.7 }}
+          >
+            “{cs.aside}”
+          </p>
+        )}
+
+        {/* Architecture reveal (flagship only) */}
+        {cs.architecture && (
+          <div className="mb-8">
+            <DragToRevealArchitecture />
           </div>
-          {/* External links */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {project.github ? (
-              <a href={project.github} target="_blank" rel="noopener noreferrer"
-                className="text-[#56526a] hover:text-text transition-colors duration-200"
-                onClick={(e) => e.stopPropagation()} title="GitHub">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </a>
-            ) : (
-              <span className="font-code text-[0.48rem] tracking-[1px] text-[#3a3847]">private</span>
-            )}
-            {project.demo && (
-              <a href={project.demo} target="_blank" rel="noopener noreferrer"
-                className="text-[#56526a] hover:text-text transition-colors duration-200"
-                onClick={(e) => e.stopPropagation()} title="Live demo">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-              </a>
-            )}
+        )}
+
+        {/* FUS Script playground (flagship only) */}
+        {cs.playground && (
+          <div className="mb-8">
+            <div
+              className="font-code text-[0.55rem] tracking-[3px] uppercase mb-3"
+              style={{ color: "#56526a" }}
+            >
+              ↓ play with a sample fus script definition
+            </div>
+            <FusScriptDemo />
           </div>
+        )}
+
+        {/* Stack rail */}
+        <div className="flex flex-wrap items-center gap-2 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+          {cs.stack.map((tech) => (
+            <span
+              key={tech}
+              className="font-code text-[0.55rem] uppercase tracking-[1.5px] px-2.5 py-1 rounded-full"
+              style={{
+                color: cs.accent,
+                background: `${cs.accent}0d`,
+                border: `1px solid ${cs.accent}22`,
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+          {cs.private && (
+            <span
+              className="font-code text-[0.5rem] tracking-[2px] uppercase px-2.5 py-1 rounded-full ml-auto"
+              style={{ color: "#56526a", border: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              private · client work
+            </span>
+          )}
         </div>
       </div>
-    </TiltCard>
     </div>
   );
 }
 
 export function Projects() {
-  const featured = projects[0];
-  const rest = projects.slice(1);
-
   return (
     <section id="work" className="py-24 md:py-36 relative z-[1]">
       <div className="max-w-[1300px] mx-auto px-6 md:px-12">
-
         {/* Section label */}
         <FadeUp>
           <span className="font-code text-[0.55rem] tracking-[6px] uppercase text-[#56526a] block mb-4">
-            02 / Work
+            02 / Selected Work
           </span>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="font-display text-[clamp(1.6rem,4vw,3.2rem)] font-extrabold tracking-[-2px] leading-[1.1] mb-14">
-            Selected{" "}
+          <h2 className="font-display text-[clamp(1.6rem,4vw,3.2rem)] font-extrabold tracking-[-2px] leading-[1.1] mb-4">
+            Four things I&apos;ve built{" "}
             <span className="serif-italic font-normal" style={{ color: "#f5f5f7" }}>
-              projects
+              end to end
             </span>
+            .
           </h2>
         </FadeUp>
-
-        {/* ── FEATURED CARD ── */}
-        <FadeUp delay={0.12}>
-          <div
-            className="gsap-project-card relative overflow-hidden rounded-3xl mb-5 group"
-            data-cursor="VIEW"
-            style={{
-              background:
-                "linear-gradient(135deg, #0e1a06 0%, #0e0e14 40%, #0a0a12 100%)",
-              border: "1px solid rgba(196,247,81,0.12)",
-              minHeight: "clamp(340px, 40vw, 480px)",
-            }}
-          >
-            {/* Radial glow from bottom-left */}
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                inset: 0,
-                background:
-                  "radial-gradient(ellipse 55% 70% at 0% 110%, rgba(196,247,81,0.12) 0%, transparent 70%)",
-              }}
-            />
-
-            {/* Animated circuit decoration */}
-            <CircuitDecoration />
-
-            {/* Content */}
-            <div className="relative z-[1] p-8 md:p-12 lg:p-16 h-full flex flex-col justify-between">
-              {/* Top row */}
-              <div className="flex items-center gap-4 mb-8">
-                <span
-                  className="font-display font-black text-[5rem] md:text-[7rem] leading-none tracking-[-6px] select-none"
-                  style={{ color: "#c4f751", opacity: 0.12 }}
-                >
-                  01
-                </span>
-                <div
-                  className="h-px flex-1"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, rgba(196,247,81,0.3), transparent)",
-                  }}
-                />
-                <span
-                  className="font-code text-[0.5rem] tracking-[4px] uppercase px-3 py-1 rounded-full border"
-                  style={{
-                    color: "#c4f751",
-                    borderColor: "rgba(196,247,81,0.25)",
-                    background: "rgba(196,247,81,0.05)",
-                  }}
-                >
-                  Featured
-                </span>
-              </div>
-
-              {/* Title */}
-              <div className="mb-6">
-                <h3
-                  className="font-display font-extrabold tracking-[-1.5px] leading-[1.08] mb-4"
-                  style={{
-                    fontSize: "clamp(1.8rem, 4vw, 3.2rem)",
-                    color: "#f5f5f7",
-                  }}
-                >
-                  {featured.title}
-                </h3>
-                <p
-                  className="text-[0.9rem] md:text-[1rem] leading-[1.8] max-w-2xl"
-                  style={{ color: "#9b97a8" }}
-                >
-                  {featured.desc}
-                </p>
-              </div>
-
-              {/* Bottom row: metrics + tags */}
-              <div className="flex flex-wrap items-end justify-between gap-8">
-                {/* Metrics */}
-                <div className="flex flex-wrap gap-8 md:gap-12">
-                  {featured.metrics!.map((m) => (
-                    <MetricCounter key={m.label} value={m.value} label={m.label} />
-                  ))}
-                </div>
-
-                {/* Tags + links */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {featured.tags.map((tag, ti) => (
-                    <span
-                      key={tag}
-                      className="flex items-center gap-1.5 font-code text-[0.55rem] uppercase tracking-[1.5px] px-3 py-1 rounded-full"
-                      style={{
-                        color: "#c4f751",
-                        background: "rgba(196,247,81,0.07)",
-                        border: "1px solid rgba(196,247,81,0.18)",
-                      }}
-                    >
-                      <span
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: tagDotColors[ti % tagDotColors.length] }}
-                      />
-                      {tag}
-                    </span>
-                  ))}
-                  {/* Show "private" badge for featured since it's proprietary */}
-                  <span
-                    className="font-code text-[0.5rem] tracking-[2px] uppercase px-3 py-1 rounded-full"
-                    style={{ color: "rgba(196,247,81,0.3)", border: "1px solid rgba(196,247,81,0.1)" }}
-                  >
-                    Private
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <FadeUp delay={0.14}>
+          <p className="text-[0.9rem] text-[#9b97a8] leading-[1.75] max-w-2xl mb-14">
+            Each of these shipped to production and has real clients on the other side.
+            I&apos;ve kept the specifics vague where they belong to an employer; the technical
+            shape is honest.
+          </p>
         </FadeUp>
 
-        {/* ── 2-COLUMN GRID ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-          {rest.map((project, i) => (
-            <FadeUp key={project.num} delay={0.06 * (i + 1)}>
-              <ProjectCard project={project} index={i} />
+        {/* Case study cards — stacked vertically for multi-paragraph depth */}
+        <div className="flex flex-col gap-6 md:gap-8">
+          {caseStudies.map((cs, i) => (
+            <FadeUp key={cs.num} delay={0.06 * (i + 1)}>
+              <CaseStudyCard cs={cs} />
             </FadeUp>
           ))}
         </div>
+
+        {/* Also shipped strip */}
+        <FadeUp delay={0.1}>
+          <div className="mt-20 md:mt-28">
+            <div className="flex items-center gap-4 mb-8">
+              <span
+                className="font-code text-[0.55rem] tracking-[4px] uppercase"
+                style={{ color: "#56526a" }}
+              >
+                also shipped
+              </span>
+              <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.06)" }} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+              {alsoShipped.map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-4 py-3 border-b"
+                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                >
+                  <span
+                    className="font-code text-[0.55rem] tracking-[2px] uppercase pt-1 flex-shrink-0"
+                    style={{ color: "#56526a" }}
+                  >
+                    {item.year}
+                  </span>
+                  <div className="flex-1">
+                    <div
+                      className="font-display text-[0.95rem] font-semibold mb-1"
+                      style={{ color: "#f5f5f7" }}
+                    >
+                      {item.title}
+                    </div>
+                    <p className="text-[0.78rem] leading-[1.65]" style={{ color: "#9b97a8" }}>
+                      {item.desc}
+                    </p>
+                    <div
+                      className="font-code text-[0.55rem] tracking-[1.5px] uppercase mt-2"
+                      style={{ color: "#56526a" }}
+                    >
+                      {item.stack}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </FadeUp>
 
         {/* Decorative "WORK" watermark */}
         <div
