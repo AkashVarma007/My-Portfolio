@@ -1,29 +1,28 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
 import { FadeUp } from "./RevealText";
 
 const projects = [
   {
     num: "01",
     title: "Device-Agnostic IoT Platform",
-    desc: "A platform that onboards any device, any protocol — without new code. Powered by FUS Script, a custom DSL I designed for runtime protocol definitions and data transformations. Distributed Redis-based messaging handles thousands of concurrent connections.",
-    tags: ["TypeScript", "DSL", "Redis", "MQTT", "WebSockets"],
-    metrics: [
-      { value: "40%", label: "Faster Integration" },
-      { value: "10K+", label: "Concurrent Devices" },
-      { value: "₹40L+", label: "Project Value" },
+    desc: "Device-agnostic IoT telemetry core — HTTP + MQTT + WebSocket ingress with a custom DSL (FUS Script) for runtime-parseable device message schemas and field-level transformations including RSA encryption. Redis-routed messaging tracks connected devices across clustered WebSocket instances so horizontal scaling doesn't break cross-instance routing.",
+    tags: ["TypeScript", "FUS Script DSL", "Redis", "MQTT", "WebSockets", "PostgreSQL"],
+    highlights: [
+      { label: "Ingress", value: "HTTP + MQTT + WS" },
+      { label: "DSL", value: "Runtime Parser" },
+      { label: "Crypto", value: "RSA Field-Level" },
     ],
     accent: "#c4f751",
     featured: true,
-    github: "", // add GitHub URL if public
-    demo: "",   // add live demo URL if available
+    github: "",
+    demo: "",
   },
   {
     num: "02",
     title: "EV Charging Infrastructure",
-    desc: "End-to-end platform with OCPP 1.6J. Real-time monitoring, analytics dashboards, sub-second telemetry, ~99% uptime.",
-    tags: ["Node.js", "OCPP 1.6", "React"],
+    desc: "Client-side OCPP 1.6J integration for EV chargers under a multi-site EV management dashboard. Onboarding across sites, real-time utilization and power-consumption monitoring, analytics surfaced to operators. Built as Varsun's delivery to WaveFuel's core product.",
+    tags: ["React", "Node.js", "OCPP 1.6J", "WebSockets"],
     accent: "#818cf8",
     featured: false,
     github: "",
@@ -32,8 +31,8 @@ const projects = [
   {
     num: "03",
     title: "IoT Mobile App",
-    desc: "Cross-platform app for device onboarding, analytics, team management, and automation. Shipped to Play Store & App Store.",
-    tags: ["React Native", "IoT", "Cross-Platform"],
+    desc: "React Native companion app for end-customers of the IoT platform. Device onboarding, usage analytics, user invitations, scene/routine automation, in-app guides. Shipped to both Play Store and App Store.",
+    tags: ["React Native", "TypeScript", "REST", "WebSockets"],
     accent: "#fb923c",
     featured: false,
     github: "",
@@ -42,8 +41,8 @@ const projects = [
   {
     num: "04",
     title: "Digital Twin Engine",
-    desc: "Plug-and-play simulation engine for 10K+ virtual IoT devices across industries.",
-    tags: ["Simulation", "Event-Driven"],
+    desc: "Reusable digital twin simulation engine. Initial vertical: dairy industry — researched end-to-end device flows, built a flexible multi-device simulator, established a pattern extensible to other industrial verticals. Enables client demos and load-testing of the IoT platform without physical hardware.",
+    tags: ["Node.js", "TypeScript", "Simulation"],
     accent: "#c4f751",
     featured: false,
     github: "",
@@ -52,8 +51,8 @@ const projects = [
   {
     num: "05",
     title: "Autonomous Job Manager",
-    desc: "AI-driven orchestration in isolated Docker containers with automated error recovery.",
-    tags: ["AI", "Docker", "Async"],
+    desc: "Personal exploration project. Deterministic orchestration engine in Go for sandboxed execution of AI task pipelines — queues jobs, isolates runtime in Docker containers, surfaces structured results with automatic error recovery. Pattern-level proof of wrapping non-deterministic LLM calls in deterministic infrastructure.",
+    tags: ["Go", "Docker", "Personal Project"],
     accent: "#818cf8",
     featured: false,
     github: "",
@@ -62,8 +61,8 @@ const projects = [
   {
     num: "06",
     title: "Sonar Analysis Platform",
-    desc: "Audio-based sonar data → heatmaps and charts. Python processing, Next.js visualization.",
-    tags: ["Python", "Next.js"],
+    desc: "Sonar-based audio analysis tool for object identification. Python signal-processing pipeline feeding a Next.js UI that renders real-time heatmap visualizations from audio streams.",
+    tags: ["Python", "NumPy/SciPy", "Next.js"],
     accent: "#fb923c",
     featured: false,
     github: "",
@@ -74,59 +73,15 @@ const projects = [
 // Tag dot colors cycle
 const tagDotColors = ["#c4f751", "#818cf8", "#fb923c", "#38bdf8", "#f472b6"];
 
-// Animated metric counter
-function MetricCounter({ value, label }: { value: string; label: string }) {
-  const [displayed, setDisplayed] = useState("0");
-  const ref = useRef<HTMLDivElement>(null);
-  const animatedRef = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !animatedRef.current) {
-          animatedRef.current = true;
-          // Extract numeric part and suffix
-          const match = value.match(/^([₹]?)(\d+(?:\.\d+)?)([KL%+]*)?$/);
-          if (!match) {
-            setDisplayed(value);
-            return;
-          }
-          const prefix = match[1] || "";
-          const num = parseFloat(match[2]);
-          const suffix = match[3] || "";
-          const duration = 1200;
-          const start = performance.now();
-
-          function tick(now: number) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = Math.floor(eased * num);
-            setDisplayed(`${prefix}${current}${suffix}`);
-            if (progress < 1) requestAnimationFrame(tick);
-            else setDisplayed(value);
-          }
-
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [value]);
-
+// Static highlight block — pairs a short value with an uppercase label.
+function Highlight({ label, value }: { label: string; value: string }) {
   return (
-    <div ref={ref} className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1">
       <span
-        className="font-display font-black text-3xl md:text-4xl tracking-tight"
+        className="font-display font-bold text-lg md:text-xl tracking-tight"
         style={{ color: "#c4f751" }}
       >
-        {displayed}
+        {value}
       </span>
       <span className="font-code text-[0.5rem] uppercase tracking-[3px] text-[#56526a]">
         {label}
@@ -361,12 +316,12 @@ export function Projects() {
                 </p>
               </div>
 
-              {/* Bottom row: metrics + tags */}
+              {/* Bottom row: highlights + tags */}
               <div className="flex flex-wrap items-end justify-between gap-8">
-                {/* Metrics */}
+                {/* Highlights */}
                 <div className="flex flex-wrap gap-8 md:gap-12">
-                  {featured.metrics!.map((m) => (
-                    <MetricCounter key={m.label} value={m.value} label={m.label} />
+                  {featured.highlights!.map((h) => (
+                    <Highlight key={h.label} value={h.value} label={h.label} />
                   ))}
                 </div>
 

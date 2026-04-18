@@ -5,7 +5,7 @@ import { useHunt } from "@/context/HuntContext";
 
 const ROW_1 = [
   "TypeScript", "React", "Node.js", "Next.js", "React Native",
-  "Redis", "Docker", "Kubernetes", "PostgreSQL", "MQTT",
+  "Redis", "Docker", "OCPP 1.6J", "PostgreSQL", "MQTT",
   "WebSockets", "Python", "Distributed Systems", "DSL Design",
 ];
 

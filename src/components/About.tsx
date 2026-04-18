@@ -11,11 +11,11 @@ const TERMINAL_LINES: Array<{ type: "command" | "blank" | "brace-open" | "brace-
   { type: "brace-open" },
   { type: "field", k: "name",       v: "Akash Varma" },
   { type: "field", k: "location",   v: "Hyderabad, India" },
-  { type: "field", k: "role",       v: "Platform Engineer" },
+  { type: "field", k: "role",       v: "Full Stack Developer" },
   { type: "field", k: "company",    v: "WaveFuel Solutions" },
-  { type: "field", k: "passion",    v: "Distributed Systems" },
+  { type: "field", k: "focus",      v: "Platform-level IoT & distributed systems" },
   { type: "field", k: "superpower", v: "Making devices talk" },
-  { type: "field", k: "mentoring",  v: "3",    special: true },
+  { type: "field", k: "mentoring",  v: "2 juniors + 1 intern", special: true },
   { type: "field", k: "coffee",     v: "critical", special: false },
   { type: "brace-close" },
 ];
@@ -62,38 +62,45 @@ export function About() {
           {/* Text */}
           <div className="space-y-5">
             <p className="text-[0.95rem] text-text-dim leading-[1.9] gsap-about-text">
-              Three years ago, I was writing boring ASP.NET code at a
-              five-person startup. I taught myself{" "}
-              <span className="text-accent font-medium">React</span> and{" "}
-              <span className="text-accent font-medium">Node.js</span>, and
-              never looked back.
+              Full-Stack Developer (~4 years) shipping production systems
+              end-to-end at a 5-person startup. Built the core of a
+              device-agnostic IoT platform — HTTP + MQTT + WebSocket ingress, a
+              custom DSL called{" "}
+              <strong className="text-text font-semibold">FUS Script</strong>{" "}
+              with a runtime parser for defining device schemas and field-level
+              transformations (including{" "}
+              <span className="text-accent font-medium">RSA encryption</span> on
+              selected fields), and a{" "}
+              <span className="text-accent font-medium">Redis-routed</span>{" "}
+              distributed WebSocket layer that keeps connected-device state
+              consistent across clustered server instances.
             </p>
             <p className="text-[0.95rem] text-text-dim leading-[1.9] gsap-about-text">
-              What started as front-end curiosity quickly evolved into
-              architecting full-scale distributed systems. I went from building
-              simple UIs to designing a{" "}
+              On top of that core, I&rsquo;ve delivered{" "}
+              <span className="text-accent font-medium">OCPP 1.6J</span>{" "}
+              integrations for EV chargers, a React Native companion app
+              shipped to Play Store and App Store, a reusable digital twin
+              simulator (initial vertical: dairy industry), an{" "}
+              <span className="text-accent font-medium">MCP toolchain</span>{" "}
+              exposing platform actions to LLM agents, and a Sonar-based audio
+              analysis tool (Python signal-processing + Next.js heatmap UI).
+            </p>
+            <p className="text-[0.95rem] text-text-dim leading-[1.9] gsap-about-text">
+              Currently mentoring{" "}
               <strong className="text-text font-semibold">
-                custom domain-specific language
+                2 junior engineers and 1 intern
               </strong>{" "}
-              that became the backbone of an entire IoT platform — one that can
-              onboard any device, speaking any protocol, without a single line
-              of new code.
-            </p>
-            <p className="text-[0.95rem] text-text-dim leading-[1.9] gsap-about-text">
-              I&rsquo;ve built EV charging infrastructure with{" "}
-              <span className="text-accent font-medium">99% uptime</span>,
-              engineered Redis-based messaging layers handling thousands of
-              concurrent connections, shipped mobile apps to both app stores,
-              and created digital twin simulators that stress-test{" "}
+              as the team scaled from 5 to 8+. Expanding into distributed-systems
+              depth and AI infrastructure patterns on the side — most recently{" "}
               <span className="text-accent font-medium">
-                10,000+ virtual devices
+                job-manager
               </span>
-              .
+              , a personal Go project exploring deterministic orchestration
+              around sandboxed LLM task pipelines.
             </p>
             <p className="text-[0.95rem] text-text-dim leading-[1.9] gsap-about-text">
-              All of this in a startup where I wore every hat — developer,
-              architect, client-facing analyst, and mentor. I don&rsquo;t just
-              write code.{" "}
+              Open to remote roles globally (B2B contractor via Deel / Remote /
+              Oyster) and on-site / hybrid in Hyderabad.{" "}
               <strong className="text-text font-semibold">
                 I build systems that scale.
               </strong>
@@ -153,16 +160,6 @@ export function About() {
                       );
                     }
                     // field
-                    if (line.k === "mentoring") {
-                      return (
-                        <div key={i} className={cls} style={{ "--td": delay } as React.CSSProperties}>
-                          &nbsp;&nbsp;
-                          <span className="text-accent-2">&quot;mentoring&quot;</span>
-                          :{" "}
-                          <span className="text-accent-3">3</span>,
-                        </div>
-                      );
-                    }
                     if (line.k === "coffee") {
                       return (
                         <div key={i} className={cls} style={{ "--td": delay } as React.CSSProperties}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FadeUp } from "./RevealText";
 import { useHunt } from "@/context/HuntContext";
 
@@ -8,44 +8,51 @@ const skills = [
   {
     title: "Languages",
     items: ["TypeScript", "JavaScript", "Python", "SQL", "DSL Design"],
-    level: 90,
+    tier: "Daily Driver",
     color: "var(--color-accent)",
     glow: "rgba(196,247,81,0.35)",
   },
   {
     title: "Frontend",
     items: ["React", "Next.js", "React Native"],
-    level: 85,
+    tier: "Daily Driver",
     color: "var(--color-accent-2)",
     glow: "rgba(129,140,248,0.35)",
   },
   {
     title: "Backend",
     items: ["Node.js", "Express.js", "Prisma ORM", "REST APIs"],
-    level: 88,
+    tier: "Daily Driver",
     color: "var(--color-accent)",
     glow: "rgba(196,247,81,0.35)",
   },
   {
     title: "DevOps",
-    items: ["Docker", "Kubernetes", "Redis", "PostgreSQL", "CI/CD", "Linux"],
-    level: 75,
+    items: ["Docker", "Redis", "PostgreSQL", "GitHub Actions", "Linux / Bash"],
+    tier: "Comfortable",
     color: "var(--color-accent-3)",
     glow: "rgba(251,146,60,0.35)",
   },
   {
     title: "IoT & Protocols",
-    items: ["MQTT", "WebSockets", "OCPP 1.6", "HTTP", "Event-Driven"],
-    level: 92,
+    items: ["MQTT", "WebSockets", "OCPP 1.6J", "HTTP", "Event-Driven"],
+    tier: "Daily Driver",
     color: "var(--color-accent)",
     glow: "rgba(196,247,81,0.35)",
   },
   {
-    title: "Architecture",
-    items: ["System Design", "DSL Engines", "Microservices", "Distributed Systems"],
-    level: 85,
+    title: "Domain",
+    items: ["FUS Script DSL", "RSA Encryption", "Digital Twin", "MCP Tools", "Audio DSP"],
+    tier: "Domain",
     color: "var(--color-accent-2)",
     glow: "rgba(129,140,248,0.35)",
+  },
+  {
+    title: "Exploring",
+    items: ["Go (job-manager)", "C# / ASP.NET", "Distributed Systems depth"],
+    tier: "Working Knowledge",
+    color: "var(--color-accent-3)",
+    glow: "rgba(251,146,60,0.35)",
   },
 ];
 
@@ -64,57 +71,36 @@ const techCloud = [
   { name: "Node.js", weight: 5 },
   { name: "Next.js", weight: 4 },
   { name: "WebSockets", weight: 4 },
-  { name: "OCPP 1.6", weight: 4 },
+  { name: "OCPP 1.6J", weight: 4 },
   { name: "Docker", weight: 4 },
   { name: "Redis", weight: 4 },
-  { name: "DSL Design", weight: 4 },
+  { name: "FUS Script DSL", weight: 4 },
   { name: "PostgreSQL", weight: 3 },
-  { name: "Kubernetes", weight: 3 },
   { name: "Python", weight: 3 },
   { name: "React Native", weight: 3 },
   { name: "Prisma ORM", weight: 3 },
-  { name: "Microservices", weight: 3 },
+  { name: "MCP Tools", weight: 3 },
   { name: "MQTT", weight: 3 },
-  { name: "CI/CD", weight: 2 },
+  { name: "GitHub Actions", weight: 2 },
   { name: "JavaScript", weight: 2 },
   { name: "SQL", weight: 2 },
-  { name: "Linux", weight: 2 },
+  { name: "Linux / Bash", weight: 2 },
   { name: "REST APIs", weight: 2 },
   { name: "Express.js", weight: 2 },
-  { name: "System Design", weight: 2 },
   { name: "Distributed Systems", weight: 2 },
+  { name: "RSA Encryption", weight: 2 },
+  { name: "Digital Twin", weight: 2 },
   { name: "HTTP", weight: 1 },
   { name: "Event-Driven", weight: 1 },
+  { name: "Go", weight: 1 },
+  { name: "C# / ASP.NET", weight: 1 },
 ];
 
-function SkillBar({ skill, index, clue8Found, onPercentClick }: { skill: typeof skills[0]; index: number; clue8Found?: boolean; onPercentClick?: () => void }) {
-  const [filled, setFilled] = useState(false);
+function SkillBar({ skill, clue8Found, onTierClick }: { skill: typeof skills[0]; clue8Found?: boolean; onTierClick?: () => void }) {
   const [hovered, setHovered] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timeoutId = setTimeout(() => setFilled(true), index * 120);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
-    };
-  }, [index]);
 
   return (
     <div
-      ref={ref}
       className="gsap-skill-card group relative"
       style={{
         background: hovered
@@ -146,7 +132,7 @@ function SkillBar({ skill, index, clue8Found, onPercentClick }: { skill: typeof 
       />
 
       {/* Header row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", gap: "10px" }}>
         <span
           style={{
             fontFamily: "var(--font-display)",
@@ -160,57 +146,24 @@ function SkillBar({ skill, index, clue8Found, onPercentClick }: { skill: typeof 
           {skill.title}
         </span>
         <span
-          onClick={clue8Found && onPercentClick ? onPercentClick : undefined}
+          onClick={clue8Found && onTierClick ? onTierClick : undefined}
           style={{
             fontFamily: "var(--font-code)",
-            fontSize: "0.6rem",
-            letterSpacing: "1px",
-            color: hovered ? skill.color : "var(--color-text-muted)",
-            transition: "color 0.3s ease",
+            fontSize: "0.52rem",
+            letterSpacing: "1.6px",
+            textTransform: "uppercase",
+            padding: "3px 9px",
+            borderRadius: "100px",
+            color: skill.color,
+            border: `1px solid ${skill.color}40`,
+            background: `${skill.color}10`,
+            transition: "color 0.3s ease, border-color 0.3s ease, background 0.3s ease",
             cursor: clue8Found ? "pointer" : "default",
+            whiteSpace: "nowrap",
           }}
         >
-          {skill.level}%
+          {skill.tier}
         </span>
-      </div>
-
-      {/* Bar track */}
-      <div
-        style={{
-          height: "5px",
-          background: "rgba(255,255,255,0.05)",
-          borderRadius: "10px",
-          overflow: "hidden",
-          marginBottom: "14px",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: filled ? `${skill.level}%` : "0%",
-            background: `linear-gradient(90deg, ${skill.color}99, ${skill.color})`,
-            borderRadius: "10px",
-            transition: "width 1.1s cubic-bezier(0.22,1,0.36,1)",
-            boxShadow: filled ? `0 0 10px ${skill.glow}` : "none",
-            position: "relative",
-          }}
-        >
-          {/* Moving shimmer on fill */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              width: "20px",
-              height: "100%",
-              background: `linear-gradient(90deg, transparent, ${skill.color})`,
-              opacity: filled ? 1 : 0,
-              filter: "blur(3px)",
-              transition: "opacity 0.3s ease 1.2s",
-            }}
-          />
-        </div>
       </div>
 
       {/* Skill pills */}
@@ -308,14 +261,14 @@ function TechCloud() {
 export function Skills() {
   const { isClueFound, canAttemptClue, unlockClue } = useHunt();
   const clue8Found = isClueFound(8);
-  const clickedPercentages = useRef(new Set<number>());
+  const clickedTiers = useRef(new Set<number>());
 
-  const handlePercentClick = useCallback((index: number) => {
+  const handleTierClick = useCallback((index: number) => {
     if (!canAttemptClue(9)) return;
-    clickedPercentages.current.add(index);
-    if (clickedPercentages.current.size >= skills.length) {
+    clickedTiers.current.add(index);
+    if (clickedTiers.current.size >= skills.length) {
       unlockClue(9);
-      clickedPercentages.current.clear();
+      clickedTiers.current.clear();
     }
   }, [canAttemptClue, unlockClue]);
 
@@ -395,7 +348,7 @@ export function Skills() {
           }}
         >
           {skills.map((skill, i) => (
-            <SkillBar key={skill.title} skill={skill} index={i} clue8Found={clue8Found} onPercentClick={() => handlePercentClick(i)} />
+            <SkillBar key={skill.title} skill={skill} clue8Found={clue8Found} onTierClick={() => handleTierClick(i)} />
           ))}
         </div>
 

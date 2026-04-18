@@ -70,25 +70,43 @@ const rajdhani = localFont({
   preload: false,
 });
 
+const META_DESCRIPTION =
+  "Full-stack developer building platform-level IoT systems — device-agnostic telemetry (HTTP + MQTT + WebSocket), custom DSL engines with runtime parsers, and Redis-routed distributed messaging. 4+ yrs shipping end-to-end at a 5-person startup. Hyderabad, India — open to remote.";
+
 export const metadata: Metadata = {
-  title: "Akash Varma — Systems & Platform Engineer",
-  description:
-    "Platform Engineer building device-agnostic IoT ecosystems, custom DSL engines, and distributed systems handling 10,000+ concurrent devices. Based in Hyderabad, India.",
-  keywords: ["Akash Varma", "Platform Engineer", "IoT", "Distributed Systems", "DSL", "TypeScript", "React", "Node.js"],
+  title: "Akash Varma — Full-Stack → Platform Engineer",
+  description: META_DESCRIPTION,
+  keywords: [
+    "Akash Varma",
+    "Full-stack developer",
+    "Platform Engineer",
+    "TypeScript",
+    "Node.js",
+    "React",
+    "React Native",
+    "MQTT",
+    "WebSockets",
+    "IoT",
+    "OCPP 1.6J",
+    "DSL",
+    "Redis",
+    "Next.js",
+    "remote",
+    "Hyderabad",
+    "India",
+  ],
   authors: [{ name: "Akash Varma" }],
   openGraph: {
     type: "website",
-    title: "Akash Varma — Systems & Platform Engineer",
-    description:
-      "Platform Engineer building device-agnostic IoT ecosystems, custom DSL engines, and distributed systems handling 10,000+ concurrent devices.",
+    title: "Akash Varma — Full-Stack → Platform Engineer",
+    description: META_DESCRIPTION,
     siteName: "Akash Varma",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Akash Varma — Systems & Platform Engineer",
-    description:
-      "Platform Engineer building device-agnostic IoT ecosystems, custom DSL engines, and distributed systems.",
+    title: "Akash Varma — Full-Stack → Platform Engineer",
+    description: META_DESCRIPTION,
   },
   robots: {
     index: true,

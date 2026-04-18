@@ -7,7 +7,7 @@ export function Footer() {
         </span>
 
         <span className="text-[0.7rem] text-text-muted">
-          Systems that scale. Code that lasts.
+          Full-Stack Developer → Platform Engineering
         </span>
       </div>
 

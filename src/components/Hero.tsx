@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
 
 const ROLES = [
-  "Systems Engineer",
-  "Platform Architect",
+  "Full-Stack Developer",
+  "Platform Engineering",
   "DSL Designer",
-  "IoT Specialist",
+  "IoT Systems Builder",
 ];
 
 const TECH_ICONS = [
@@ -22,10 +22,10 @@ const TECH_ICONS = [
 ];
 
 const STATS = [
-  { value: 3,     suffix: "+",  label: "Years Building" },
+  { value: 4,     suffix: "+",  label: "Years Building" },
   { value: 6,     suffix: "",   label: "Production Systems" },
   { value: 2,     suffix: "",   label: "App Stores Shipped" },
-  { value: 3,     suffix: "",   label: "Engineers Mentored" },
+  { value: 3,     suffix: "",   label: "Juniors + Intern" },
 ];
 
 function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {
@@ -238,11 +238,10 @@ export function Hero() {
         <div className="gsap-hero-bottom">
           {/* One-liner description */}
           <p className="max-w-lg text-[0.95rem] text-text-dim leading-[1.8] mb-10">
-            I architect device-agnostic IoT ecosystems, design custom DSL engines,
-            and build distributed systems handling{" "}
-            <span className="text-accent font-medium">10,000+</span> concurrent
-            devices.{" "}
-            <span className="text-text-muted">Based in Hyderabad, India.</span>
+            I ship end-to-end at a 5-person startup — device-agnostic IoT
+            telemetry (<span className="text-accent font-medium">HTTP + MQTT + WebSocket</span>),
+            a custom DSL runtime, and Redis-routed distributed messaging.{" "}
+            <span className="text-text-muted">Hyderabad, India · open to remote.</span>
           </p>
 
           {/* CTA buttons */}
