@@ -25,7 +25,7 @@ const STATS = [
   { value: 4,     suffix: "+",  label: "Years Building" },
   { value: 6,     suffix: "",   label: "Production Systems" },
   { value: 2,     suffix: "",   label: "App Stores Shipped" },
-  { value: 3,     suffix: "",   label: "Juniors + Intern" },
+  { value: 6,     suffix: "+",  label: "Protocols" },
 ];
 
 function useTypingEffect(words: string[], typingSpeed = 80, pauseMs = 1800) {

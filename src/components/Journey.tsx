@@ -7,7 +7,7 @@ import { useHunt } from "@/context/HuntContext";
 const timeline = [
   {
     year: "Y1",
-    phase: "The Foundation",
+    phase: "The Pivot",
     role: "Dotnet Developer @ Varsun eTechnologies",
     period: "2022 – 2023",
     text: "Joined as an ASP.NET developer; pivoted within months to React + Node.js after being deployed to Varsun's client WaveFuel for their core EV charging product. Led client-side OCPP 1.6J integration for chargers. Designed a multi-site EV management dashboard (backend + frontend) with real-time utilization and power-consumption analytics.",
@@ -16,6 +16,7 @@ const timeline = [
     glowColor: "rgba(251,146,60,0.18)",
     borderColor: "rgba(251,146,60,0.18)",
     numberColor: "rgba(251,146,60,0.15)",
+    ongoing: false,
   },
   {
     year: "Y2",
@@ -28,18 +29,33 @@ const timeline = [
     glowColor: "rgba(129,140,248,0.18)",
     borderColor: "rgba(129,140,248,0.18)",
     numberColor: "rgba(129,140,248,0.12)",
+    ongoing: false,
   },
   {
     year: "Y3",
-    phase: "The Builder",
+    phase: "The Shipper",
     role: "Full Stack Developer @ WaveFuel Solutions",
-    period: "2024 – Present",
-    text: "Converted to WaveFuel FTE. Built a drag-and-drop form builder with embeddable iframe output. Shipped the IoT companion app (React Native) to Play Store and App Store. Designed MCP (Model Context Protocol) tools exposing platform actions to LLM agents for natural-language device control. Built a reusable digital twin simulation engine (initial vertical: dairy industry). Mentoring 2 junior engineers and 1 intern as the team scaled from 5 to 8+.",
-    stack: ["Form Builder", "MCP Tools", "Digital Twin", "Mentorship"],
+    period: "2024 – 2025",
+    text: "Converted to WaveFuel FTE. Built a drag-and-drop form builder with embeddable iframe output for client data-capture flows. Shipped the IoT companion app (React Native) to Play Store and App Store — polish, hardening, release. Early MCP (Model Context Protocol) tool design for the internal AI chatbot. Established code-review standards and async-first execution rhythms.",
+    stack: ["Form Builder", "React Native", "MCP Tools", "iframe Embed"],
     accentColor: "var(--color-accent)",
     glowColor: "rgba(196,247,81,0.18)",
     borderColor: "rgba(196,247,81,0.18)",
     numberColor: "rgba(196,247,81,0.1)",
+    ongoing: false,
+  },
+  {
+    year: "Y4",
+    phase: "The Scale",
+    role: "Full Stack Developer @ WaveFuel Solutions",
+    period: "2025 – Present",
+    text: "Deepened MCP toolchain exposing platform actions to LLM agents for natural-language device onboarding, control, and analytics automation. Built a reusable digital twin simulation engine (initial vertical: dairy industry — researched end-to-end device flows, pattern extensible to other industrials). Mentoring 2 junior engineers and 1 intern as the team scaled from 5 to 8+. Expanding into distributed-systems depth and AI infrastructure patterns on the side.",
+    stack: ["MCP Tools", "Digital Twin", "Mentorship", "Distributed Systems"],
+    accentColor: "#38bdf8",
+    glowColor: "rgba(56,189,248,0.22)",
+    borderColor: "rgba(56,189,248,0.22)",
+    numberColor: "rgba(56,189,248,0.12)",
+    ongoing: true,
   },
 ];
 
@@ -154,18 +170,49 @@ function JourneyCard({
           }}
         />
 
-        {/* Phase */}
-        <div
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "1.15rem",
-            fontWeight: 800,
-            letterSpacing: "-0.5px",
-            color: "var(--color-text)",
-            marginBottom: "4px",
-          }}
-        >
-          {item.phase}
+        {/* Phase + in-progress tag */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "1.15rem",
+              fontWeight: 800,
+              letterSpacing: "-0.5px",
+              color: "var(--color-text)",
+            }}
+          >
+            {item.phase}
+          </div>
+          {item.ongoing && (
+            <span
+              style={{
+                fontFamily: "var(--font-code)",
+                fontSize: "0.5rem",
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                padding: "2px 8px",
+                borderRadius: "100px",
+                color: item.accentColor,
+                border: `1px solid ${item.accentColor}55`,
+                background: `${item.accentColor}15`,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span
+                style={{
+                  width: "5px",
+                  height: "5px",
+                  borderRadius: "50%",
+                  background: item.accentColor,
+                  animation: "ongoing-dot 1.4s ease-in-out infinite",
+                  boxShadow: `0 0 8px ${item.accentColor}`,
+                }}
+              />
+              In Progress
+            </span>
+          )}
         </div>
 
         {/* Role + period */}
@@ -318,7 +365,7 @@ function DesktopTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; on
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 50%, var(--color-accent) 100%)",
+              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 33%, var(--color-accent) 66%, #38bdf8 100%)",
             transformOrigin: "top center",
             transform: "scaleY(0)",
             borderRadius: "2px",
@@ -490,7 +537,7 @@ function MobileTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; onY
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 50%, var(--color-accent) 100%)",
+              "linear-gradient(180deg, var(--color-accent-3) 0%, var(--color-accent-2) 33%, var(--color-accent) 66%, #38bdf8 100%)",
             transformOrigin: "top center",
             transform: "scaleY(0)",
             borderRadius: "2px",
@@ -575,6 +622,10 @@ export function Journey() {
         @keyframes timeline-dot-pulse {
           0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(1); }
           50% { opacity: 0.5; transform: translateX(-50%) scale(1.6); }
+        }
+        @keyframes ongoing-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.35); }
         }
       `}</style>
 
