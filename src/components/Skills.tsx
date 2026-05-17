@@ -273,7 +273,7 @@ export function Skills() {
   }, [canAttemptClue, unlockClue]);
 
   return (
-    <section id="skills" className="py-24 md:py-36 relative z-[1]">
+    <section id="skills" className="py-16 md:py-36 relative z-[1] overflow-hidden">
       {/* Diagonal line background pattern */}
       <div
         aria-hidden

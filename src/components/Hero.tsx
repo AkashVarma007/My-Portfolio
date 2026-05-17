@@ -135,7 +135,7 @@ export function Hero() {
       {/* Orbiting tech icons — decorative background layer */}
       <div
         aria-hidden
-        className="absolute right-0 top-0 w-[640px] h-[640px] select-none"
+        className="hidden md:block absolute right-0 top-0 w-[640px] h-[640px] select-none"
         style={{ opacity: 0.18, zIndex: 2 }}
       >
         {TECH_ICONS.map((tech, i) => {
@@ -274,22 +274,22 @@ export function Hero() {
           </div>
 
           {/* Stats row */}
-          <div className="flex flex-wrap gap-px border-t border-border-light pt-8">
+          <div className="flex flex-wrap gap-y-6 md:gap-y-0 md:gap-px border-t border-border-light pt-8">
             {STATS.map((stat) => (
               <div
                 key={stat.label}
-                className="flex-1 min-w-[120px] px-6 first:pl-0 last:pr-0 border-r border-border-light last:border-r-0"
+                className="w-1/2 md:flex-1 md:w-auto md:min-w-[120px] md:px-6 md:first:pl-0 md:last:pr-0 md:border-r md:border-border-light md:last:border-r-0"
               >
-                <div className="font-display font-extrabold text-[clamp(2rem,4vw,3rem)] text-accent leading-none mb-1">
+                <div className="font-display font-extrabold text-[1.75rem] md:text-[clamp(2rem,4vw,3rem)] text-accent leading-none mb-1">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="font-code text-[0.6rem] tracking-[3px] uppercase text-text-muted">
+                <div className="font-code text-[0.55rem] md:text-[0.6rem] tracking-[3px] uppercase text-text-muted">
                   {stat.label}
                 </div>
               </div>
             ))}
 
-            <div className="flex-1 min-w-[120px] px-6 last:pr-0 flex items-center justify-end gap-4">
+            <div className="hidden md:flex md:flex-1 md:min-w-[120px] md:px-6 items-center justify-end gap-4">
               <div className="w-10 h-[2px] bg-accent rounded-full animate-pulse-scale" />
               <span className="font-code text-[0.55rem] tracking-[4px] uppercase text-text-muted">
                 Scroll

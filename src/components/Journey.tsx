@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FadeUp } from "./RevealText";
 import { useHunt } from "@/context/HuntContext";
 
@@ -61,50 +61,13 @@ const timeline = [
 
 function JourneyCard({
   item,
-  index,
-  side,
 }: {
   item: typeof timeline[0];
-  index: number;
-  side: "left" | "right";
 }) {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timeoutId = setTimeout(() => setVisible(true), index * 150);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(el);
-    return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
-    };
-  }, [index]);
-
   return (
     <div
-      ref={ref}
       className="gsap-journey-card"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? "translateX(0) translateY(0)"
-          : side === "left"
-          ? "translateX(-32px) translateY(10px)"
-          : "translateX(32px) translateY(10px)",
-        transition: "opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1)",
-        position: "relative",
-      }}
+      style={{ position: "relative" }}
     >
       {/* Glow behind card */}
       <div
@@ -113,8 +76,6 @@ function JourneyCard({
           inset: "-20px",
           background: `radial-gradient(ellipse at center, ${item.glowColor} 0%, transparent 70%)`,
           pointerEvents: "none",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.8s ease 0.3s",
           borderRadius: "24px",
         }}
       />
@@ -391,7 +352,7 @@ function DesktopTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; on
               {/* Left slot */}
               <div style={{ paddingRight: "32px", paddingLeft: "0" }}>
                 {side === "left" ? (
-                  <JourneyCard item={item} index={i} side="left" />
+                  <JourneyCard item={item} />
                 ) : (
                   // Connector line from right card to spine
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
@@ -414,7 +375,7 @@ function DesktopTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; on
               {/* Right slot */}
               <div style={{ paddingLeft: "32px", paddingRight: "0" }}>
                 {side === "right" ? (
-                  <JourneyCard item={item} index={i} side="right" />
+                  <JourneyCard item={item} />
                 ) : (
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <div
@@ -546,7 +507,7 @@ function MobileTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; onY
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-        {timeline.map((item, i) => (
+        {timeline.map((item) => (
           <div key={item.year} style={{ position: "relative" }}>
             {/* Badge on the line */}
             <div
@@ -580,7 +541,7 @@ function MobileTimeline({ clue7Found, onYearClick }: { clue7Found?: boolean; onY
               </span>
             </div>
 
-            <JourneyCard item={item} index={i} side="right" />
+            <JourneyCard item={item} />
           </div>
         ))}
       </div>
@@ -608,7 +569,7 @@ export function Journey() {
   }, [canAttemptClue, unlockClue]);
 
   return (
-    <section id="journey" className="py-24 md:py-36 relative z-[1]">
+    <section id="journey" className="py-16 md:py-36 relative z-[1] overflow-hidden">
       {/* CSS keyframes injected via style tag */}
       <style>{`
         @keyframes badge-pulse {

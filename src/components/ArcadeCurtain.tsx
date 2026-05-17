@@ -46,24 +46,48 @@ export function ArcadeCurtain() {
     return () => window.removeEventListener(ARCADE_EVENT, handleTrigger);
   }, []);
   const lastWheelTime = useRef(0);
+  const touchStartY = useRef<number | null>(null);
   const [sceneStep, setSceneStep] = useState(0); // 0=nothing, 1=grid+emblem, 2=text, 3=subtitle+bar
+
+  // Shared progress accumulator (wheel + touch)
+  const accumulate = useCallback((bump: number) => {
+    lastWheelTime.current = Date.now();
+    progressRef.current = Math.min(100, progressRef.current + bump);
+    setProgress(progressRef.current);
+    if (progressRef.current >= 100 && !triggered.current) {
+      triggered.current = true;
+      setPhase("dropping");
+    }
+  }, []);
 
   // ── Wheel handler ──
   const handleWheel = useCallback((e: WheelEvent) => {
     if (triggered.current || e.deltaY <= 0) return;
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     if (window.scrollY < maxScroll - 2) return;
-
-    lastWheelTime.current = Date.now();
     // Reduced bump so it takes deliberate sustained scrolling (not accidental)
-    const bump = Math.min(2.5, Math.max(0.6, Math.abs(e.deltaY) / 60));
-    progressRef.current = Math.min(100, progressRef.current + bump);
-    setProgress(progressRef.current);
+    accumulate(Math.min(2.5, Math.max(0.6, Math.abs(e.deltaY) / 60)));
+  }, [accumulate]);
 
-    if (progressRef.current >= 100 && !triggered.current) {
-      triggered.current = true;
-      setPhase("dropping");
-    }
+  // ── Touch handlers (mobile) ──
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartY.current = e.touches[0]?.clientY ?? null;
+  }, []);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (triggered.current || touchStartY.current == null) return;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (window.scrollY < maxScroll - 2) return;
+    const currentY = e.touches[0]?.clientY;
+    if (currentY == null) return;
+    const deltaY = touchStartY.current - currentY; // positive = swiping up (scroll down direction)
+    if (deltaY <= 0) return;
+    touchStartY.current = currentY;
+    accumulate(Math.min(2.5, Math.max(0.6, deltaY / 14)));
+  }, [accumulate]);
+
+  const handleTouchEnd = useCallback(() => {
+    touchStartY.current = null;
   }, []);
 
   // ── Decay loop ──
@@ -86,11 +110,21 @@ export function ArcadeCurtain() {
     return () => { running = false; cancelAnimationFrame(rafId); };
   }, []);
 
-  // ── Wheel listener ──
+  // ── Wheel + touch listeners ──
   useEffect(() => {
     window.addEventListener("wheel", handleWheel, { passive: true });
-    return () => window.removeEventListener("wheel", handleWheel);
-  }, [handleWheel]);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [handleWheel, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   // ── Phase sequence ──
   useEffect(() => {

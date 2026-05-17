@@ -53,7 +53,7 @@ export function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="py-28 md:py-40 relative z-[1] overflow-hidden"
+      className="py-16 md:py-40 relative z-[1] overflow-hidden"
     >
       {/* Grid background */}
       <div

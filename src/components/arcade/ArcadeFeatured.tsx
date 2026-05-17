@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useHunt } from "@/context/HuntContext";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 const RED    = "#ff2d55";
 const ORANGE = "#ff6b2d";
@@ -147,6 +148,8 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
   const padded = String(gameIndex + 1).padStart(2, "0");
   const total  = String(totalGames).padStart(2, "0");
 
+  const isMobile = useIsMobile();
+
   return (
     <div
       style={{
@@ -232,21 +235,31 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
       <div
         style={{
           position: "absolute",
-          top: 0, right: 0, bottom: 0,
-          width: "48%",
+          ...(isMobile
+            ? { top: 60, left: 0, right: 0, height: 200 }
+            : { top: 0, right: 0, bottom: 0, width: "48%" }),
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           zIndex: 2,
+          pointerEvents: "none",
+          opacity: isMobile ? 0.35 : 1,
         }}
       >
         {/* Pulse rings */}
-        <div style={{ position: "relative", width: 280, height: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          position: "relative",
+          width: isMobile ? 200 : 280,
+          height: isMobile ? 200 : 280,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
           {/* Outer pulse ring A */}
           <div
             aria-hidden
             style={{
-              position: "absolute", width: 260, height: 260, borderRadius: "50%",
+              position: "absolute",
+              width: isMobile ? 180 : 260, height: isMobile ? 180 : 260,
+              borderRadius: "50%",
               border: `1px solid ${game.categoryColor}25`,
               animation: "arc-pulse 3s ease-out infinite",
             }}
@@ -255,7 +268,9 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           <div
             aria-hidden
             style={{
-              position: "absolute", width: 260, height: 260, borderRadius: "50%",
+              position: "absolute",
+              width: isMobile ? 180 : 260, height: isMobile ? 180 : 260,
+              borderRadius: "50%",
               border: `1px solid ${game.categoryColor}20`,
               animation: "arc-pulse 3s ease-out infinite 1.5s",
             }}
@@ -264,7 +279,9 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           <div
             aria-hidden
             style={{
-              position: "absolute", width: 190, height: 190, borderRadius: "50%",
+              position: "absolute",
+              width: isMobile ? 140 : 190, height: isMobile ? 140 : 190,
+              borderRadius: "50%",
               border: `1px solid ${game.categoryColor}35`,
             }}
           />
@@ -272,7 +289,9 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           <div
             aria-hidden
             style={{
-              position: "absolute", width: 150, height: 150, borderRadius: "50%",
+              position: "absolute",
+              width: isMobile ? 110 : 150, height: isMobile ? 110 : 150,
+              borderRadius: "50%",
               border: `1px dashed ${game.categoryColor}22`,
               animation: "arc-spin 18s linear infinite",
             }}
@@ -281,7 +300,9 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           <div
             aria-hidden
             style={{
-              position: "absolute", width: 200, height: 200, borderRadius: "50%",
+              position: "absolute",
+              width: isMobile ? 150 : 200, height: isMobile ? 150 : 200,
+              borderRadius: "50%",
               background: `radial-gradient(circle, ${game.categoryColor}14 0%, transparent 70%)`,
               filter: "blur(20px)",
             }}
@@ -289,7 +310,7 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           {/* Icon */}
           <span
             style={{
-              fontSize: 120,
+              fontSize: isMobile ? 80 : 120,
               lineHeight: 1,
               position: "relative", zIndex: 1,
               filter: `drop-shadow(0 0 30px ${game.categoryColor}55) drop-shadow(0 0 70px rgba(255,45,85,0.2))`,
@@ -300,23 +321,25 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           </span>
 
           {/* Category badge */}
-          <div
-            style={{
-              position: "absolute", bottom: 12, left: "50%",
-              transform: "translateX(-50%)",
-              padding: "4px 14px",
-              background: `${game.categoryColor}20`,
-              border: `1px solid ${game.categoryColor}40`,
-              borderRadius: 2,
-              fontFamily: "var(--font-orbitron), monospace",
-              fontSize: 9, fontWeight: 700,
-              letterSpacing: 3, textTransform: "uppercase" as const,
-              color: game.categoryColor,
-              whiteSpace: "nowrap" as const,
-            }}
-          >
-            {game.category}
-          </div>
+          {!isMobile && (
+            <div
+              style={{
+                position: "absolute", bottom: 12, left: "50%",
+                transform: "translateX(-50%)",
+                padding: "4px 14px",
+                background: `${game.categoryColor}20`,
+                border: `1px solid ${game.categoryColor}40`,
+                borderRadius: 2,
+                fontFamily: "var(--font-orbitron), monospace",
+                fontSize: 9, fontWeight: 700,
+                letterSpacing: 3, textTransform: "uppercase" as const,
+                color: game.categoryColor,
+                whiteSpace: "nowrap" as const,
+              }}
+            >
+              {game.category}
+            </div>
+          )}
         </div>
       </div>
 
@@ -328,8 +351,8 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "60px 48px",
-          maxWidth: "54%",
+          padding: isMobile ? "60px 24px 48px" : "60px 48px",
+          maxWidth: isMobile ? "100%" : "54%",
         }}
       >
         {/* Game counter */}
@@ -401,18 +424,22 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
         {/* Stats row */}
         <div
           style={{
-            display: "flex", gap: 0, marginBottom: 36,
+            display: "flex",
+            flexWrap: isMobile ? "wrap" : "nowrap",
+            gap: 0, marginBottom: 36,
             border: "1px solid rgba(255,255,255,0.06)",
             borderRadius: 4,
             overflow: "hidden",
             alignSelf: "flex-start",
+            maxWidth: "100%",
           }}
         >
           {/* High score */}
           <div
             style={{
-              padding: "12px 20px",
+              padding: isMobile ? "10px 14px" : "12px 20px",
               borderRight: "1px solid rgba(255,255,255,0.06)",
+              flex: isMobile ? "1 1 50%" : undefined,
             }}
           >
             <div
@@ -446,8 +473,9 @@ export function ArcadeFeatured({ game, gameIndex, totalGames, onLaunch }: Arcade
             <div
               key={stat.label}
               style={{
-                padding: "12px 20px",
+                padding: isMobile ? "10px 14px" : "12px 20px",
                 borderRight: i < desc.stats.length - 1 ? "1px solid rgba(255,255,255,0.06)" : undefined,
+                flex: isMobile ? "1 1 50%" : undefined,
               }}
             >
               <div

@@ -226,7 +226,7 @@ export function Projects() {
   const rest = projects.slice(1);
 
   return (
-    <section id="work" className="py-24 md:py-36 relative z-[1]">
+    <section id="work" className="py-16 md:py-36 relative z-[1] overflow-hidden">
       <div className="max-w-[1300px] mx-auto px-6 md:px-12">
 
         {/* Section label */}
@@ -269,11 +269,11 @@ export function Projects() {
             <CircuitDecoration />
 
             {/* Content */}
-            <div className="relative z-[1] p-8 md:p-12 lg:p-16 h-full flex flex-col justify-between">
+            <div className="relative z-[1] p-6 md:p-12 lg:p-16 h-full flex flex-col justify-between">
               {/* Top row */}
               <div className="flex items-center gap-4 mb-8">
                 <span
-                  className="font-display font-black text-[5rem] md:text-[7rem] leading-none tracking-[-6px] select-none"
+                  className="font-display font-black text-[3.5rem] md:text-[7rem] leading-none tracking-[-6px] select-none"
                   style={{ color: "#c4f751", opacity: 0.12 }}
                 >
                   01

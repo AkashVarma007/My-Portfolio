@@ -199,16 +199,17 @@ export function ArcadeSection() {
 
           {/* ── Game library strip ─────────────────────────────────────── */}
           <div
+            className="arcade-library-strip"
             style={{
               display: "flex", alignItems: "stretch", gap: 0,
-              padding: "28px 28px 52px",
               borderTop: "1px solid rgba(255,255,255,0.05)",
               background: "rgba(0,0,0,0.15)",
               backdropFilter: "blur(8px)",
             }}
           >
-            {/* Vertical "Library" label */}
+            {/* Vertical "Library" label (hidden on mobile) */}
             <div
+              className="arcade-library-label"
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 writingMode: "vertical-rl", textOrientation: "mixed",
@@ -282,6 +283,11 @@ export function ArcadeSection() {
         @keyframes arc-grid-drift {
           from { background-position: 0 0; }
           to   { background-position: 0 60px; }
+        }
+        .arcade-library-strip { padding: 28px 28px 52px; }
+        @media (max-width: 767px) {
+          .arcade-library-strip { padding: 18px 14px 36px; }
+          .arcade-library-label { display: none !important; }
         }
       `}</style>
     </div>
