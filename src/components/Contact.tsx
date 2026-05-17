@@ -17,22 +17,29 @@ export function Contact() {
     e.preventDefault();
     if (status === "sending") return;
 
-    const formspreeId = process.env.NEXT_PUBLIC_FORMSPREE_ID;
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
     const form = formRef.current;
-    if (!form) return;
+    if (!form || !accessKey) {
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 4000);
+      return;
+    }
 
     setStatus("sending");
 
     try {
-      if (formspreeId) {
-        const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
-          method: "POST",
-          body: new FormData(form),
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) throw new Error("Formspree error");
-      }
-      // If no Formspree ID configured, just show success (dev mode)
+      const formData = new FormData(form);
+      formData.append("access_key", accessKey);
+      formData.append("subject", "New portfolio contact — akashvarma.dev");
+      formData.append("from_name", "akashvarma.dev");
+
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Web3Forms error");
+
       setStatus("sent");
       form.reset();
       setTimeout(() => setStatus("idle"), 4000);
@@ -79,6 +86,15 @@ export function Contact() {
           {/* Left — form */}
           <div className="fade-up-element">
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
+              {/* Honeypot — bots fill every field; humans never see it. Web3Forms drops submission if non-empty. */}
+              <input
+                type="checkbox"
+                name="botcheck"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: "absolute", left: "-9999px", width: 0, height: 0, opacity: 0 }}
+              />
               <InputField
                 id="name"
                 label="Name"
