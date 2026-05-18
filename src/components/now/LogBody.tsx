@@ -1,4 +1,3 @@
-// src/components/now/LogBody.tsx
 "use client";
 
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
@@ -18,11 +17,18 @@ type Props = { body: LogBodyBlock[]; clueId?: number };
 export function LogBody({ body, clueId }: Props) {
   const components: PortableTextComponents = {
     block: {
-      normal: ({ children }) => (
-        <p className="my-4 text-base md:text-lg text-[color:var(--now-fg)]/90 leading-relaxed">
-          {children}
-        </p>
-      ),
+      normal: ({ children }) => <p>{children}</p>,
+      h2: ({ children }) => <h2>{children}</h2>,
+      h3: ({ children }) => <h3>{children}</h3>,
+      blockquote: ({ children }) => <blockquote>{children}</blockquote>,
+    },
+    list: {
+      bullet: ({ children }) => <ul>{children}</ul>,
+      number: ({ children }) => <ol>{children}</ol>,
+    },
+    listItem: {
+      bullet: ({ children }) => <li>{children}</li>,
+      number: ({ children }) => <li>{children}</li>,
     },
     marks: {
       redacted: ({ value, children }) => (
@@ -38,10 +44,17 @@ export function LogBody({ body, clueId }: Props) {
       signalChip: ({ value, children }) => (
         <SignalChip label={value?.label}>{children}</SignalChip>
       ),
-      code: ({ children }) => (
-        <code className="font-[var(--font-mono)] text-[color:var(--now-accent)] px-1">
+      code: ({ children }) => <code>{children}</code>,
+      strong: ({ children }) => <strong>{children}</strong>,
+      em: ({ children }) => <em>{children}</em>,
+      link: ({ value, children }) => (
+        <a
+          href={value?.href}
+          target={value?.blank ? "_blank" : undefined}
+          rel={value?.blank ? "noopener noreferrer" : undefined}
+        >
           {children}
-        </code>
+        </a>
       ),
     },
     types: {
@@ -59,9 +72,5 @@ export function LogBody({ body, clueId }: Props) {
     },
   };
 
-  return (
-    <div className="max-w-[720px] mx-auto">
-      <PortableText value={body as unknown as never} components={components} />
-    </div>
-  );
+  return <PortableText value={body as unknown as never} components={components} />;
 }

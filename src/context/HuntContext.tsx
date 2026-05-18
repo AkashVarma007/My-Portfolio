@@ -41,6 +41,7 @@ interface HuntContextValue extends HuntState {
   currentTier: number;
   clueJustFound: number | null;
   dismissClueToast: () => void;
+  hydrated: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -104,9 +105,24 @@ export function HuntProvider({ children }: { children: ReactNode }) {
   const [clueJustFound, setClueJustFound] = useState<number | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  // Load from localStorage on mount (client-only)
+  // Load from localStorage on mount (client-only).
+  //
+  // Merge — don't overwrite — because child components' useEffects fire
+  // BEFORE the provider's, so an auto-unlock (e.g. ArcadeEntryEffect calling
+  // unlockClue(1) on mount) has already queued a state update by the time we
+  // get here. A plain setState(loaded) would clobber it.
   useEffect(() => {
-    setState(loadFromStorage());
+    const loaded = loadFromStorage();
+    setState((prev) => ({
+      cluesFound: Array.from(new Set([...loaded.cluesFound, ...prev.cluesFound])),
+      gameScores: {
+        snake: Math.max(loaded.gameScores.snake, prev.gameScores.snake),
+        invaders: Math.max(loaded.gameScores.invaders, prev.gameScores.invaders),
+        breakout: Math.max(loaded.gameScores.breakout, prev.gameScores.breakout),
+        pong: Math.max(loaded.gameScores.pong, prev.gameScores.pong),
+      },
+      achievements: Array.from(new Set([...loaded.achievements, ...prev.achievements])),
+    }));
     setHydrated(true);
   }, []);
 
@@ -213,6 +229,7 @@ export function HuntProvider({ children }: { children: ReactNode }) {
     currentTier,
     clueJustFound,
     dismissClueToast,
+    hydrated,
   };
 
   return <HuntContext.Provider value={value}>{children}</HuntContext.Provider>;

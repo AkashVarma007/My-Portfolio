@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { registerLenis } from "@/lib/lenis";
 
 /** Mount once in the tree — initialises Lenis and pipes it through GSAP's
  *  own ticker so there is exactly ONE RAF loop for both. */
@@ -17,6 +18,8 @@ export function SmoothScroll() {
       wheelMultiplier: 0.45,
     });
 
+    registerLenis(lenis);
+
     // Named so we can remove the exact same reference on cleanup
     const onTick = (time: number) => lenis.raf(time * 1000);
 
@@ -26,6 +29,7 @@ export function SmoothScroll() {
     lenis.on("scroll", ScrollTrigger.update);
 
     return () => {
+      registerLenis(null);
       gsap.ticker.remove(onTick);
       lenis.off("scroll", ScrollTrigger.update);
       lenis.destroy();

@@ -1,7 +1,6 @@
-// src/components/now/blocks/RedactedSpan.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useHunt } from "@/context/HuntContext";
 
@@ -44,7 +43,7 @@ export function RedactedSpan({ isClue, payload, clueId, children }: Props) {
     setRevealed(true);
     if (!target) return;
     const start = performance.now();
-    const duration = 900;
+    const duration = 700;
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
       const lockedCount = Math.floor(t * target.length);
@@ -71,7 +70,7 @@ export function RedactedSpan({ isClue, payload, clueId, children }: Props) {
       aria-pressed={revealed}
       onClick={handleClick}
       onKeyDown={handleKey}
-      className="now-redacted"
+      className="now-redact"
       data-revealed={revealed ? "true" : "false"}
       data-is-clue={isClue ? "true" : "false"}
     >

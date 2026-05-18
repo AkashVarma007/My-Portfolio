@@ -8,13 +8,16 @@ import { AchievementWidget } from "@/components/hunt/AchievementWidget";
 import { ClueToast } from "@/components/hunt/ClueToast";
 import { HiddenTerminal } from "@/components/hunt/HiddenTerminal";
 
-// Auto-unlocks clue 1 ("Enter the Arcade") when the user arrives at /arcade
+// Auto-unlocks clue 1 ("Enter the Arcade") when the user arrives at /arcade.
+// Waits for hydration so the closure-based dedupe inside unlockClue sees the
+// loaded cluesFound — otherwise a revisit would re-fire the "Fragment Found"
+// toast even though clue 1 is already in storage.
 function ArcadeEntryEffect() {
-  const { unlockClue } = useHunt();
+  const { unlockClue, hydrated } = useHunt();
   useEffect(() => {
+    if (!hydrated) return;
     unlockClue(1);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hydrated, unlockClue]);
   return null;
 }
 

@@ -1,4 +1,3 @@
-// src/components/now/DecryptShell.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -40,10 +39,7 @@ export function DecryptShell({ logId, children }: Props) {
   }, [logId]);
 
   if (decrypted === null) return null;
-
-  if (decrypted) {
-    return <>{children}</>;
-  }
+  if (decrypted) return <>{children}</>;
 
   function handleDecrypt() {
     setAnimating(true);
@@ -52,32 +48,28 @@ export function DecryptShell({ logId, children }: Props) {
       if (!list.includes(logId)) list.push(logId);
       writeDecrypted(list);
       setDecrypted(true);
-    }, 1500);
+    }, 900);
   }
 
   return (
-    <div className="relative">
-      <div aria-hidden={animating ? "false" : "true"} className="opacity-40 blur-sm pointer-events-none select-none">
-        {children}
-      </div>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6">
-        <div className="now-scan-card max-w-md w-full p-6 md:p-8 font-[var(--font-mono)] text-center">
-          <div className="now-priority-classified text-sm tracking-wider">
-            TRANSMISSION ENCRYPTED
-          </div>
-          <p className="mt-5 text-[color:var(--now-fg)]/85 text-sm md:text-base">
-            This log is classified. Press DECRYPT to access the broadcast.
-          </p>
-          <button
-            type="button"
-            onClick={handleDecrypt}
-            disabled={animating}
-            className="mt-7 px-4 py-2 border border-[color:var(--now-accent)] text-[color:var(--now-accent)] hover:bg-[color:var(--now-accent)]/10 transition-colors disabled:opacity-60"
-          >
-            {animating ? "DECRYPTING…" : "[ DECRYPT TRANSMISSION ]"}
-          </button>
-        </div>
-      </div>
-    </div>
+    <section className="now-decrypt">
+      <div className="now-decrypt__eyebrow">classified</div>
+      <h1 className="now-decrypt__title">
+        this entry is locked. press decrypt to read.
+      </h1>
+      <p className="now-decrypt__body">
+        marked classified to keep it out of the open feed. nothing dangerous —
+        just kept quiet on purpose.
+      </p>
+      <button
+        type="button"
+        onClick={handleDecrypt}
+        disabled={animating}
+        className="now-decrypt__btn"
+      >
+        {animating ? "decrypting…" : "decrypt"}
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
   );
 }

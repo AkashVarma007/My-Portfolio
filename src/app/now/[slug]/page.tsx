@@ -1,4 +1,4 @@
-// src/app/now/[slug]/page.tsx
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
@@ -6,20 +6,58 @@ import {
   fetchLogBySlug,
   fetchPrevNext,
 } from "@/lib/sanity/queries";
-import { LogHeader } from "@/components/now/LogHeader";
-import { LogTitle } from "@/components/now/LogTitle";
+import type { LogDetail, LogNeighbor } from "@/lib/sanity/types";
 import { LogBody } from "@/components/now/LogBody";
-import { FooterNav } from "@/components/now/FooterNav";
 import { DecryptShell } from "@/components/now/DecryptShell";
 
-// Runtime note: ISR / on-demand revalidate is nodejs-only. Default runtime
-// (nodejs) + generateStaticParams pre-renders every slug at build time;
-// webhook (/api/revalidate) busts cache on publish. No timed ISR.
 export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   const slugs = await fetchAllSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+function formatLongDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function renderTags(log: LogDetail): string {
+  return log.tags.map((t) => t.toLowerCase()).join(" · ");
+}
+
+function FootCell({
+  side,
+  neighbor,
+}: {
+  side: "prev" | "next";
+  neighbor: LogNeighbor;
+}) {
+  const label = side === "prev" ? "← previous" : "next →";
+  const className = `now-foot__link${
+    side === "next" ? " now-foot__cell--next" : ""
+  }`;
+
+  if (!neighbor) {
+    return (
+      <span className={className} aria-disabled="true">
+        <span className="now-foot__label">{label}</span>
+        <span className="now-foot__title">—</span>
+      </span>
+    );
+  }
+
+  return (
+    <Link href={`/now/${neighbor.slug}`} className={className}>
+      <span className="now-foot__label">{label}</span>
+      <span className="now-foot__title">{neighbor.title}</span>
+    </Link>
+  );
 }
 
 export default async function NowDetailPage(props: {
@@ -32,15 +70,36 @@ export default async function NowDetailPage(props: {
   const { prev, next } = await fetchPrevNext(log.publishedAt);
 
   const content = (
-    <article className="px-6 md:px-12 max-w-5xl mx-auto pt-24 md:pt-32 pb-24">
-      <LogHeader log={log} />
-      <div className="mt-12">
-        <LogTitle title={log.title} />
-        <div className="mt-8">
-          <LogBody body={log.body ?? []} clueId={log.clueId} />
-        </div>
+    <article className="now-detail">
+      <Link href="/now" className="now-detail__crumb">
+        <span aria-hidden="true">←</span> back to now
+      </Link>
+
+      <h1 className="now-detail__title">{log.title}</h1>
+
+      <div className="now-detail__meta">
+        <span className="now-mono">{formatLongDate(log.publishedAt)}</span>
+        {log.tags.length > 0 ? (
+          <span className="now-mono">{renderTags(log)}</span>
+        ) : null}
+        {log.location ? (
+          <span className="now-mono">{log.location.toLowerCase()}</span>
+        ) : null}
+        {log.priority !== "NORMAL" ? (
+          <span className="now-mono">{log.priority.toLowerCase()}</span>
+        ) : null}
       </div>
-      <FooterNav prev={prev} next={next} />
+
+      <div className="now-detail__rule" aria-hidden="true" />
+
+      <div className="now-detail__body">
+        <LogBody body={log.body ?? []} clueId={log.clueId} />
+      </div>
+
+      <nav className="now-foot" aria-label="other entries">
+        <FootCell side="prev" neighbor={prev} />
+        <FootCell side="next" neighbor={next} />
+      </nav>
     </article>
   );
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
   { label: "About",   href: "#about"   },
@@ -15,6 +16,8 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const [active, setActive]         = useState("");
+  const pathname = usePathname();
+  const onHome = pathname === "/";
 
   // Backdrop blur once scrolled past hero
   useEffect(() => {
@@ -23,8 +26,9 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Active section tracking via IntersectionObserver
+  // Active section tracking via IntersectionObserver (home only)
   useEffect(() => {
+    if (!onHome) { setActive(""); return; }
     const sectionIds = links.map((l) => l.href.replace("#", ""));
     const observers: IntersectionObserver[] = [];
 
@@ -40,7 +44,7 @@ export function Navigation() {
     });
 
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [onHome]);
 
   const scrollTo = (href: string) => {
     setMobileOpen(false);
@@ -61,39 +65,64 @@ export function Navigation() {
           borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "1px solid transparent",
         }}
       >
-        <a
-          href="#"
-          onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          className="font-display text-lg font-extrabold tracking-tight text-text"
-        >
-          akash varma
-        </a>
+        {onHome ? (
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            className="font-display text-lg font-extrabold tracking-tight text-text"
+          >
+            akash varma
+          </a>
+        ) : (
+          <Link
+            href="/"
+            className="font-display text-lg font-extrabold tracking-tight text-text"
+          >
+            akash varma
+          </Link>
+        )}
 
         <div className="hidden md:flex gap-10">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
-              className="relative text-[0.7rem] font-medium tracking-[2px] uppercase transition-colors duration-300"
-              style={{ color: active === link.href ? "var(--color-text)" : "var(--color-text-dim)" }}
-            >
-              {link.label}
-              {/* Active dot */}
-              {active === link.href && (
-                <span
-                  className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent"
-                  style={{ boxShadow: "0 0 6px rgba(196,247,81,0.8)" }}
-                />
-              )}
-            </a>
-          ))}
+          {links.map((link) =>
+            onHome ? (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
+                className="relative text-[0.7rem] font-medium tracking-[2px] uppercase transition-colors duration-300"
+                style={{ color: active === link.href ? "var(--color-text)" : "var(--color-text-dim)" }}
+              >
+                {link.label}
+                {active === link.href && (
+                  <span
+                    className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent"
+                    style={{ boxShadow: "0 0 6px rgba(196,247,81,0.8)" }}
+                  />
+                )}
+              </a>
+            ) : (
+              <a
+                key={link.href}
+                href={`/${link.href}`}
+                className="relative text-[0.7rem] font-medium tracking-[2px] uppercase transition-colors duration-300"
+                style={{ color: "var(--color-text-dim)" }}
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <Link
             href="/now"
             className="relative text-[0.7rem] font-medium tracking-[2px] uppercase transition-colors duration-300"
-            style={{ color: "var(--color-text-dim)" }}
+            style={{ color: pathname?.startsWith("/now") ? "var(--color-text)" : "var(--color-text-dim)" }}
           >
             Now
+            {pathname?.startsWith("/now") && (
+              <span
+                className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent"
+                style={{ boxShadow: "0 0 6px rgba(196,247,81,0.8)" }}
+              />
+            )}
           </Link>
         </div>
 
@@ -115,21 +144,33 @@ export function Navigation() {
           style={{ background: "rgba(8,8,12,0.97)", backdropFilter: "blur(20px)" }}
           onClick={() => setMobileOpen(false)}
         >
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
-              className="font-display text-4xl font-bold transition-colors duration-300"
-              style={{ color: active === link.href ? "var(--color-accent)" : "var(--color-text-dim)" }}
-            >
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) =>
+            onHome ? (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
+                className="font-display text-4xl font-bold transition-colors duration-300"
+                style={{ color: active === link.href ? "var(--color-accent)" : "var(--color-text-dim)" }}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <a
+                key={link.href}
+                href={`/${link.href}`}
+                onClick={() => setMobileOpen(false)}
+                className="font-display text-4xl font-bold transition-colors duration-300"
+                style={{ color: "var(--color-text-dim)" }}
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <Link
             href="/now"
             className="font-display text-4xl font-bold transition-colors duration-300"
-            style={{ color: "var(--color-text-dim)" }}
+            style={{ color: pathname?.startsWith("/now") ? "var(--color-accent)" : "var(--color-text-dim)" }}
             onClick={() => setMobileOpen(false)}
           >
             Now
