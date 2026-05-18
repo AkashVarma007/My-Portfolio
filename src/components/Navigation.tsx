@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const links = [
   { label: "About",   href: "#about"   },
@@ -87,6 +88,13 @@ export function Navigation() {
               )}
             </a>
           ))}
+          <Link
+            href="/now"
+            className="relative text-[0.7rem] font-medium tracking-[2px] uppercase transition-colors duration-300"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            Now
+          </Link>
         </div>
 
         <button
@@ -118,6 +126,14 @@ export function Navigation() {
               {link.label}
             </a>
           ))}
+          <Link
+            href="/now"
+            className="font-display text-4xl font-bold transition-colors duration-300"
+            style={{ color: "var(--color-text-dim)" }}
+            onClick={() => setMobileOpen(false)}
+          >
+            Now
+          </Link>
         </div>
       )}
     </>
