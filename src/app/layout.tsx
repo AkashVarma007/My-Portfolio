@@ -70,6 +70,20 @@ const rajdhani = localFont({
   preload: false,
 });
 
+const vt323 = localFont({
+  src: "../../node_modules/@fontsource/vt323/files/vt323-latin-400-normal.woff2",
+  variable: "--font-vt323",
+  display: "swap",
+  preload: false,
+});
+
+const pressStart2P = localFont({
+  src: "../../node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2",
+  variable: "--font-press-start",
+  display: "swap",
+  preload: false,
+});
+
 const META_DESCRIPTION =
   "Full-stack developer building platform-level IoT systems — device-agnostic telemetry (HTTP + MQTT + WebSocket), custom DSL engines with runtime parsers, and Redis-routed distributed messaging. 4+ yrs shipping end-to-end at a 5-person startup. Hyderabad, India — open to remote.";
 
@@ -123,7 +137,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${outfit.variable} ${bricolage.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${rajdhani.variable} antialiased`}
+      className={`${outfit.variable} ${bricolage.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${rajdhani.variable} ${vt323.variable} ${pressStart2P.variable} antialiased`}
     >
       <body>{children}</body>
     </html>

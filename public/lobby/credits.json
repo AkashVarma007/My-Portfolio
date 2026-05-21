@@ -1,0 +1,39 @@
+{
+  "assets": [
+    {
+      "name": "Sunnyside Pixel Art Pack",
+      "author": "Daniel Diggle",
+      "url": "https://danieldiggle.itch.io/sunnyside",
+      "license": "PWYW ($0 minimum) — commercial OK, no credit required. No AI training, no NFT, no raw redistribution.",
+      "use": "Characters, environment, props, animations"
+    },
+    {
+      "name": "Snowy Pixel Art",
+      "author": "ScratchBattles / squaremeapixel",
+      "url": "https://squaremeapixel.itch.io/snowy",
+      "license": "Free for commercial use, no credit required.",
+      "use": "Snowball sprite + snow tiles"
+    },
+    {
+      "name": "Kenney pixel UI",
+      "author": "Kenney",
+      "url": "https://kenney.nl/assets/tag:pixel",
+      "license": "CC0 — public domain",
+      "use": "UI fallback (chat box, buttons, icons)"
+    },
+    {
+      "name": "VT323",
+      "author": "Peter Hull",
+      "url": "https://fonts.google.com/specimen/VT323",
+      "license": "OFL",
+      "use": "Body / dialogue font"
+    },
+    {
+      "name": "Press Start 2P",
+      "author": "Cody \"CodeMan38\" Boisclair",
+      "url": "https://fonts.google.com/specimen/Press+Start+2P",
+      "license": "OFL",
+      "use": "Heading / label font"
+    }
+  ]
+}
