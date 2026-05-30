@@ -7,12 +7,14 @@ export function initPostHog(): typeof posthog | null {
   if (initialized) return posthog;
 
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "/ingest";
+  const uiHost = process.env.NEXT_PUBLIC_POSTHOG_UI_HOST ?? "https://us.posthog.com";
 
   if (!key) return null;
 
   const config: Partial<PostHogConfig> = {
     api_host: host,
+    ui_host: uiHost,
     persistence: "memory",
     disable_persistence: true,
     disable_session_recording: true,
