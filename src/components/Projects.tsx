@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeUp } from "./RevealText";
+import { Events, track } from "@/lib/analytics/events";
 
 const projects = [
   {
@@ -137,6 +138,7 @@ function ProjectCard({ project }: { project: typeof projects[number] }) {
         transition: "border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease",
         ["--card-accent" as string]: project.accent,
       }}
+      onClick={() => track(Events.ProjectCardClicked, { project_id: project.num })}
     >
       {/* Accent top border — visible on hover via group */}
       <div
@@ -254,6 +256,7 @@ export function Projects() {
               border: "1px solid rgba(196,247,81,0.12)",
               minHeight: "clamp(340px, 40vw, 480px)",
             }}
+            onClick={() => track(Events.ProjectCardClicked, { project_id: featured.num })}
           >
             {/* Radial glow from bottom-left */}
             <div

@@ -6,9 +6,11 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
   ReactNode,
 } from "react";
 import { CLUES, TOTAL_CLUES } from "@/data/clues";
+import { Events, track } from "@/lib/analytics/events";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -133,6 +135,27 @@ export function HuntProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
+  // Hunt completion event — fires once per session when all clues found.
+  // duration_ms measures time-from-mount, not absolute hunt duration, since
+  // we deliberately do not persist a hunt-start timestamp.
+  const huntCompletedFiredRef = useRef(false);
+  const huntStartTsRef = useRef<number>(0);
+
+  useEffect(() => {
+    huntStartTsRef.current = Date.now();
+  }, []);
+
+  useEffect(() => {
+    if (huntCompletedFiredRef.current) return;
+    if (state.cluesFound.length >= TOTAL_CLUES) {
+      huntCompletedFiredRef.current = true;
+      track(Events.HuntCompleted, {
+        total_clues: TOTAL_CLUES,
+        duration_ms: Date.now() - huntStartTsRef.current,
+      });
+    }
+  }, [state.cluesFound.length]);
+
   // ------------------------------------------------------------------
   // Derived values
   // ------------------------------------------------------------------
@@ -181,6 +204,7 @@ export function HuntProvider({ children }: { children: ReactNode }) {
         cluesFound: [...prev.cluesFound, id],
       }));
       setClueJustFound(id);
+      track(Events.HuntClueUnlocked, { clue_id: id, tier: clue.tier });
       return true;
     },
     [state.cluesFound]

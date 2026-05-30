@@ -2,6 +2,12 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Events, track } from "@/lib/analytics/events";
+
+function detectDevice(): "desktop" | "mobile" {
+  if (typeof window === "undefined") return "desktop";
+  return "ontouchstart" in window ? "mobile" : "desktop";
+}
 
 const RED = "#ff2d55";
 const ORANGE = "#ff6b2d";
@@ -39,6 +45,7 @@ export function ArcadeCurtain() {
     function handleTrigger() {
       if (!triggered.current) {
         triggered.current = true;
+        track(Events.ArcadeCurtainTriggered, { device: detectDevice() });
         setPhase("dropping");
       }
     }
@@ -56,6 +63,7 @@ export function ArcadeCurtain() {
     setProgress(progressRef.current);
     if (progressRef.current >= 100 && !triggered.current) {
       triggered.current = true;
+      track(Events.ArcadeCurtainTriggered, { device: detectDevice() });
       setPhase("dropping");
     }
   }, []);

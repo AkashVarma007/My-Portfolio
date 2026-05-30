@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useHunt } from "@/context/HuntContext";
+import { Events, track } from "@/lib/analytics/events";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -116,6 +117,7 @@ export function BreakoutGame() {
         stateRef.current = ns;
         setPhase("playing");
         setDisplayScore(0);
+        track(Events.ArcadeGameStarted, { game: "breakout" });
       }
     }
   }, []);
@@ -174,6 +176,7 @@ export function BreakoutGame() {
       if (b.y - BALL_RADIUS > H) {
         s.phase = "dead";
         setPhase("dead");
+        track(Events.ArcadeGameScore, { game: "breakout", score: s.score });
       }
 
       // Paddle collision
@@ -224,6 +227,7 @@ export function BreakoutGame() {
       if (!anyAlive) {
         s.phase = "win";
         setPhase("win");
+        track(Events.ArcadeGameScore, { game: "breakout", score: s.score });
 
         // Clue 9 trigger on win
         if (!s.clue10Unlocked && canAttemptClue(10)) {

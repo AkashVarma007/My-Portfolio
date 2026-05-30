@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useHunt } from "@/context/HuntContext";
+import { Events, track } from "@/lib/analytics/events";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,7 @@ export function PongGame() {
         setPhase("playing");
         setDisplayPlayerScore(0);
         setDisplayAiScore(0);
+        track(Events.ArcadeGameStarted, { game: "pong" });
       }
     }
   }, []);
@@ -187,6 +189,7 @@ export function PongGame() {
         if (s.aiScore >= WIN_SCORE) {
           s.phase = "lose";
           setPhase("lose");
+          track(Events.ArcadeGameScore, { game: "pong", score: s.playerScore * 100 });
         } else {
           s.ball = randomBall();
         }
@@ -198,6 +201,7 @@ export function PongGame() {
         if (s.playerScore >= WIN_SCORE) {
           s.phase = "win";
           setPhase("win");
+          track(Events.ArcadeGameScore, { game: "pong", score: s.playerScore * 100 });
         } else {
           s.ball = randomBall();
         }

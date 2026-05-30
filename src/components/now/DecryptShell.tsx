@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { Events, track } from "@/lib/analytics/events";
 
 const KEY = "akash_now_decrypted";
 
@@ -27,10 +28,11 @@ function writeDecrypted(ids: number[]) {
 
 type Props = {
   logId: number;
+  slug: string;
   children: ReactNode;
 };
 
-export function DecryptShell({ logId, children }: Props) {
+export function DecryptShell({ logId, slug, children }: Props) {
   const [decrypted, setDecrypted] = useState<boolean | null>(null);
   const [animating, setAnimating] = useState(false);
 
@@ -43,6 +45,7 @@ export function DecryptShell({ logId, children }: Props) {
 
   function handleDecrypt() {
     setAnimating(true);
+    track(Events.NowDecryptPressed, { slug });
     window.setTimeout(() => {
       const list = readDecrypted();
       if (!list.includes(logId)) list.push(logId);

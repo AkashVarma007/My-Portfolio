@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useHunt } from "@/context/HuntContext";
+import { Events, track } from "@/lib/analytics/events";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -132,6 +133,7 @@ export function InvadersGame() {
           setPhase("playing");
           setDisplayScore(0);
           setDisplayWave(1);
+          track(Events.ArcadeGameStarted, { game: "invaders" });
         } else if (s.phase === "wave_clear") {
           const nextWave = s.wave + 1;
           const ns = makeInitialState(nextWave);
@@ -217,9 +219,10 @@ export function InvadersGame() {
       // Check invader reached bottom or hits player
       for (const row of s.invaders) {
         for (const inv of row) {
-          if (inv.alive && inv.y + INV_H >= H - 20) {
+          if (inv.alive && inv.y + INV_H >= H - 20 && s.phase === "playing") {
             s.phase = "dead";
             setPhase("dead");
+            track(Events.ArcadeGameScore, { game: "invaders", score: s.score });
           }
         }
       }
@@ -284,6 +287,7 @@ export function InvadersGame() {
         if (eb.x >= px && eb.x <= px + pw && eb.y >= py && eb.y <= py + ph) {
           s.phase = "dead";
           setPhase("dead");
+          track(Events.ArcadeGameScore, { game: "invaders", score: s.score });
           break;
         }
       }

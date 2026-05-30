@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useHunt } from "@/context/HuntContext";
+import { Events, track } from "@/lib/analytics/events";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
 
@@ -41,10 +42,12 @@ export function Contact() {
       if (!data.success) throw new Error(data.message || "Web3Forms error");
 
       setStatus("sent");
+      track(Events.ContactFormSubmitted, { success: true });
       form.reset();
       setTimeout(() => setStatus("idle"), 4000);
     } catch {
       setStatus("error");
+      track(Events.ContactFormSubmitted, { success: false });
       setTimeout(() => setStatus("idle"), 4000);
     }
   }
@@ -93,6 +96,7 @@ export function Contact() {
                 tabIndex={-1}
                 autoComplete="off"
                 aria-hidden="true"
+                data-ph-no-capture
                 style={{ position: "absolute", left: "-9999px", width: 0, height: 0, opacity: 0 }}
               />
               <InputField
@@ -127,6 +131,7 @@ export function Contact() {
                   onFocus={() => setFocused("message")}
                   onBlur={() => setFocused(null)}
                   className="contact-input"
+                  data-ph-no-capture
                   style={{
                     borderColor: focused === "message" ? "var(--color-accent)" : undefined,
                     boxShadow: focused === "message" ? "0 0 0 3px rgba(196,247,81,0.06), 0 0 20px rgba(196,247,81,0.04)" : undefined,
@@ -329,6 +334,7 @@ function InputField({
         onFocus={() => setFocused(id)}
         onBlur={() => setFocused(null)}
         className="contact-input"
+        data-ph-no-capture
         style={{
           borderColor: isFocused ? "var(--color-accent)" : undefined,
           boxShadow: isFocused ? "0 0 0 3px rgba(196,247,81,0.06), 0 0 20px rgba(196,247,81,0.04)" : undefined,

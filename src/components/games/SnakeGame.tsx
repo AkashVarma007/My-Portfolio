@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useHunt } from "@/context/HuntContext";
+import { Events, track } from "@/lib/analytics/events";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -161,6 +162,7 @@ export function SnakeGame() {
     if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) {
       gameOverRef.current = true;
       updateGameScore("snake", scoreRef.current);
+      track(Events.ArcadeGameScore, { game: "snake", score: scoreRef.current });
       setIsGameOver(true);
       return;
     }
@@ -171,6 +173,7 @@ export function SnakeGame() {
     if (snake.some((s) => pointsEqual(s, newHead))) {
       gameOverRef.current = true;
       updateGameScore("snake", scoreRef.current);
+      track(Events.ArcadeGameScore, { game: "snake", score: scoreRef.current });
       setIsGameOver(true);
       return;
     }
@@ -225,6 +228,7 @@ export function SnakeGame() {
     startedRef.current = true;
     clue6TriggeredRef.current = false;
 
+    track(Events.ArcadeGameStarted, { game: "snake" });
     setDisplayScore(0);
     setIsGameOver(false);
     setIsStarted(true);

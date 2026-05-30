@@ -9,6 +9,7 @@ import {
 import type { LogDetail, LogNeighbor } from "@/lib/sanity/types";
 import { LogBody } from "@/components/now/LogBody";
 import { DecryptShell } from "@/components/now/DecryptShell";
+import { NowLogViewLogger } from "@/components/now/NowLogViewLogger";
 
 export const dynamic = "force-static";
 
@@ -71,6 +72,7 @@ export default async function NowDetailPage(props: {
 
   const content = (
     <article className="now-detail">
+      <NowLogViewLogger slug={slug} priority={log.priority} />
       <Link href="/now" className="now-detail__crumb">
         <span aria-hidden="true">←</span> back to now
       </Link>
@@ -104,7 +106,7 @@ export default async function NowDetailPage(props: {
   );
 
   if (log.priority === "CLASSIFIED") {
-    return <DecryptShell logId={log.id}>{content}</DecryptShell>;
+    return <DecryptShell logId={log.id} slug={slug}>{content}</DecryptShell>;
   }
   return content;
 }

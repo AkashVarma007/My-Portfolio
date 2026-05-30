@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Providers } from "@/app/providers";
 
 // Self-hosted via @fontsource — zero Google network requests in dev
 const outfit = localFont({
@@ -139,7 +140,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${outfit.variable} ${bricolage.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${rajdhani.variable} ${vt323.variable} ${pressStart2P.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
